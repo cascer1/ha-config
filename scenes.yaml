@@ -265,3 +265,105 @@
       friendly_name: living room corner
       supported_features: 63
       state: 'on'
+  icon: mdi:home-remove-outline
+- id: '1611403761959'
+  name: home
+  entities:
+    light.dining_table_down:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      - random
+      brightness: 255
+      hs_color:
+      - 38.667
+      - 52.941
+      rgb_color:
+      - 255
+      - 207
+      - 120
+      xy_color:
+      - 0.457
+      - 0.41
+      effect: none
+      friendly_name: Dining table down
+      supported_features: 63
+      state: 'on'
+    light.dining_table_up:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      - random
+      brightness: 255
+      hs_color:
+      - 38.667
+      - 52.941
+      rgb_color:
+      - 255
+      - 207
+      - 120
+      xy_color:
+      - 0.457
+      - 0.41
+      effect: none
+      friendly_name: Dining table up
+      supported_features: 63
+      state: 'on'
+    light.kitchen_cabinets:
+      brightness: 255
+      friendly_name: Kitchen Cabinets
+      supported_features: 41
+      state: 'on'
+    light.kitchen_ceiling:
+      min_mireds: 153
+      max_mireds: 454
+      brightness: 255
+      color_temp: 366
+      friendly_name: Kitchen ceiling
+      supported_features: 43
+      state: 'on'
+    light.living_room_ceiling:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      - random
+      brightness: 255
+      hs_color:
+      - 38.667
+      - 52.941
+      rgb_color:
+      - 255
+      - 207
+      - 120
+      xy_color:
+      - 0.457
+      - 0.41
+      effect: none
+      friendly_name: living room ceiling
+      supported_features: 63
+      state: 'on'
+    light.living_room_corner:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      - random
+      brightness: 255
+      hs_color:
+      - 38.667
+      - 52.941
+      rgb_color:
+      - 255
+      - 207
+      - 120
+      xy_color:
+      - 0.457
+      - 0.41
+      effect: none
+      friendly_name: living room corner
+      supported_features: 63
+      state: 'on'
+  icon: mdi:home-lightbulb-outline
