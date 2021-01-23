@@ -1,0 +1,61 @@
+  energy_monthly_low_meter:
+    source: sensor.energy_consumption_tarif_1
+    cycle: monthly
+    offset:
+      days: 14
+  energy_monthly_high_meter:
+    source: sensor.energy_consumption_tarif_2
+    cycle: monthly
+    offset:
+      days: 14
+  energy_monthly_total_meter:
+    source: sensor.energy_consumption_total_custom
+    cycle: monthly
+    offset:
+      days: 14
+  energy_daily_low_meter:
+    source: sensor.energy_consumption_tarif_1
+    cycle: daily
+  energy_daily_high_meter:
+    source: sensor.energy_consumption_tarif_2
+    cycle: daily
+  energy_daily_total_meter:
+    source: sensor.energy_consumption_total_custom
+    cycle: daily
+  energy_production_monthly_low_meter:
+    source: sensor.energy_production_tarif_1
+    cycle: monthly
+    offset:
+      days: 14
+  energy_production_monthly_high_meter:
+    source: sensor.energy_production_tarif_2
+    cycle: monthly
+    offset:
+      days: 14
+  energy_production_monthly_total_meter:
+    source: sensor.energy_production_total_custom
+    cycle: monthly
+    offset:
+      days: 14
+  energy_production_daily_low_meter:
+    source: sensor.energy_production_tarif_1
+    cycle: daily
+  energy_production_daily_high_meter:
+    source: sensor.energy_production_tarif_2
+    cycle: daily
+  energy_production_daily_total_meter:
+    source: sensor.energy_production_total_custom
+    cycle: daily
+  gas_monthly_meter:
+    source: sensor.gas_consumption
+    cycle: monthly
+    offset:
+      days: 14
+  gas_daily_meter:
+    source: sensor.gas_consumption
+    cycle: daily
+  solar_monthly_meter:
+    source: sensor.solaredge_lifetime_energy
+    cycle: monthly
+    offset:
+      days: 14

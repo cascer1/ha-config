@@ -1,0 +1,51 @@
+away_temperature:
+  name: Away temperature
+  min: 10.0
+  max: 20.0
+  step: 0.5
+  initial: 16.0
+  unit_of_measurement: °C
+  mode: box
+  icon: mdi:temperature-celsius
+home_temperature:
+  name: Home temperature
+  min: 15.0
+  max: 25.0
+  step: 0.5
+  initial: 19.5
+  unit_of_measurement: °C
+  mode: box
+  icon: mdi:temperature-celsius
+power_peak_tariff:
+  name: Peak power tariff
+  min: 0.0
+  max: 100.0
+  step: 0.001
+  unit_of_measurement: c/kWh
+  mode: box
+  icon: mdi:mdi:currency-eur
+power_offpeak_tariff:
+  name: Offpeak power tariff
+  min: 0.0
+  max: 100.0
+  step: 0.001
+  unit_of_measurement: c/kWh
+  mode: box
+  icon: mdi:mdi:currency-eur
+gas_tariff:
+  name: Gas tariff
+  min: 0.0
+  max: 100.0
+  step: 0.001
+  unit_of_measurement: c/m3
+  mode: box
+  icon: mdi:mdi:currency-eur
+sun_elevation_dark:
+  name: Darkness sun elevation
+  initial: 2.0
+  min: -90
+  max: 90
+  step: 0.1
+  unit_of_measurement: °
+  mode: box
+  icon: mdi:theme-light-dark

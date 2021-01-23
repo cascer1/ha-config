@@ -1,0 +1,164 @@
+- id: dim_lights_tv
+  alias: Dim lights when watching TV
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: media_player.plex_plex_for_android_tv_living_room_tv
+    to: playing
+  - platform: state
+    entity_id: media_player.living_room_tv
+    to: playing
+  condition:
+  - condition: state
+    entity_id: light.living_room
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    below: '-2.0'
+  action:
+  - scene: scene.watching_tv
+  
+- id: reset_lights_tv
+  alias: Reset lights when pausing TV
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: media_player.plex_plex_for_android_tv_living_room_tv
+    from: playing
+    for: 00:00:05
+  - platform: state
+    entity_id: media_player.living_room_tv
+    from: playing
+    for: 00:00:05
+  condition:
+  - condition: state
+    entity_id: light.living_room
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    below: input_number.sun_elevation_dark
+  action:
+  - scene: scene.relax
+  
+- id: thermostat_down_away
+  alias: Thermostat low while away
+  description: 'Keep the thermostat temperature down while away'
+  trigger:
+  - platform: state
+    entity_id: climate.tstat_8d728f
+    attribute: temperature
+  condition:
+  - condition: state
+    entity_id: group.awesome_people
+    state: not_home
+  - condition: template
+    value_template: '{{ (state_attr(''climate.tstat_8d728f'', ''temperature'')|float) > (states(''input_number.away_temperature'') | float) }}'
+  action:
+  - service: script.thermostat_away
+  
+- id: leaving_home
+  alias: Leaving home
+  description: Turn down the thermostat and turn off the lights when everyone leaves
+    and stays away for 5 minutes.
+  trigger:
+  - platform: state
+    entity_id: group.awesome_people
+    from: home
+    to: not_home
+    for: 00:05:00
+  action:
+  - service: script.lights_not_home
+  - service: script.thermostat_away
+
+- id: returning_home
+  alias: Returning home
+  description: Turn up the thermostat and turn on the lights when someone comes home
+  trigger:
+  - platform: state
+    entity_id: group.awesome_people
+    from: not_home
+    to: home
+  action:
+  - service: script.lights_home
+  - choose:
+    - conditions:
+      - condition: time
+        after: 06:00:00
+        before: '22:00:00'
+      sequence:
+      - service: script.thermostat_home
+
+- id: office_lights_on
+  alias: Office lights on
+  description: Turn on the office lights when a computer is turned on.
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.bert_desktop
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.cas_desktop
+    to: 'on'
+  action:
+  - service: light.turn_on
+    entity_id: light.office
+
+- id: sun_setting
+  alias: 'Sun setting'
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunset
+    offset: -00:30:00
+  condition:
+  - condition: state
+    entity_id: light.downstairs
+    state: 'off'
+  action:
+    - service: script.lights_{{states('group.awesome_people')}}
+
+- id: lights_off_away
+  alias: lights off when away
+  description: 'Turn off the lights when nobody is home at night'
+  trigger:
+  - platform: time
+    at: '23:00'
+  - platform: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    above: input_number.sun_elevation_dark
+  condition:
+  - condition: state
+    entity_id: group.awesome_people
+    state: not_home
+  action:
+  - service: light.turn_off
+    entity_id: light.everywhere
+
+- id: store_daily_utility_usage
+  alias: Store daily utility usage
+  trigger:
+  - platform: time
+    at: '23:59:55'
+  action:
+  - service: notify.utilitydaily
+    data_template:
+      message: ',{{states.sensor.energy_daily_low_meter.state}},{{states.sensor.energy_daily_high_meter.state}},{{states.sensor.energy_production_daily_low_meter.state}},{{states.sensor.energy_production_daily_high_meter.state}},{{(states.sensor.solaredge_energy_today.state
+        | float)/1000}},{{states.sensor.gas_daily_meter.state}}'
+  initial_state: 'true'
+
+- id: store_monthly_utility_usage
+  alias: Store monthly utility usage
+  trigger:
+  - platform: time
+    at: '23:59:55'
+  condition:
+  - condition: template
+    value_template: '{{now().day == 14}}'
+  action:
+  - service: notify.utilitymonthly
+    data_template:
+      message: ',{{states.sensor.energy_monthly_low_meter.state}},{{states.sensor.energy_monthly_high_meter.state}},{{states.sensor.energy_production_monthly_low_meter.state}},{{states.sensor.energy_production_monthly_high_meter.state}},{{(states.sensor.solar_monthly_meter.state
+        | float)/1000}},{{states.sensor.gas_monthly_meter.state}}'
+  initial_state: 'true'

@@ -1,0 +1,8 @@
+sensor.average_gas:
+  friendly_name: Gas Consumption
+sensor.average_consumption:
+  friendly_name: Average Power Consumption
+sensor.average_production:
+  friendly_name: Average Power Production
+sensor.average_consumption_net:
+  friendly_name: Average Power Usage

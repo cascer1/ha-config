@@ -1,0 +1,7 @@
+## groups.yaml
+# https://www.home-assistant.io/components/group/
+awesome_people:
+  name: Awesome People
+  entities:
+    - person.bert
+    - person.cas_eliens
