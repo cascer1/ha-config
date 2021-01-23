@@ -1,8 +1,6 @@
-## scripts.yaml
-# Learn more at https://www.home-assistant.io/components/script/
 thermostat_away:
   alias: Thermostat to away
-  description: 'Set the thermostat temperature to the configured away temperature'
+  description: Set the thermostat temperature to the configured away temperature
   icon: mdi:thermostat
   mode: single
   sequence:
@@ -10,10 +8,9 @@ thermostat_away:
     entity_id: climate.tstat_8d728f
     data:
       temperature: '{{ states(''input_number.away_temperature'') | float }}'
-
 thermostat_home:
   alias: Thermostat to home
-  description: 'Set the thermostat temperature to the configured home temperature'
+  description: Set the thermostat temperature to the configured home temperature
   icon: mdi:thermostat
   mode: single
   sequence:
@@ -21,10 +18,9 @@ thermostat_home:
     entity_id: climate.tstat_8d728f
     data:
       temperature: '{{ states(''input_number.home_temperature'') | float }}'
-      
 lights_not_home:
-  alias: Lights leaving home
-  description: 'Set the lights when leaving home, depending on daylight'
+  alias: Lights not home
+  description: Set the lights when leaving home, depending on daylight
   icon: mdi:lamp
   mode: single
   sequence:
@@ -32,26 +28,24 @@ lights_not_home:
     - conditions:
       - condition: and
         conditions:
-          - condition: numeric_state
-            entity_id: sun.sun
-            attribute: elevation
-            below: input_number.sun_elevation_dark
-          - condition: time
-            after: '12:00:00'
-            before: '22:59:59'
+        - condition: numeric_state
+          entity_id: sun.sun
+          attribute: elevation
+          below: input_number.sun_elevation_dark
+        - condition: time
+          after: '12:00:00'
+          before: '22:59:59'
       sequence:
       - scene: scene.away
     default:
-      - service: light.turn_off
-        entity_id: light.everywhere
-
+    - service: light.turn_off
+      entity_id: light.everywhere
 lights_home:
-  alias: Lights returning home
-  description: 'Turn on the lights when returning home'
-  icon: mid:lamp
+  alias: Lights home
+  description: Turn on the lights when returning home
+  icon: mdi:lamp
   mode: single
   sequence:
-  # Activate lights based on daytime
   - choose:
     - conditions:
       - condition: numeric_state

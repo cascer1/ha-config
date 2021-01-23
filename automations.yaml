@@ -124,10 +124,8 @@
   trigger:
   - platform: time
     at: '23:00'
-  - platform: numeric_state
-    entity_id: sun.sun
-    attribute: elevation
-    above: input_number.sun_elevation_dark
+  - platform: template
+    value_template: '{{ states(''sun.sun.elevation'') > states(''input_number.sun_elevation_dark'') }}'
   condition:
   - condition: state
     entity_id: group.awesome_people
