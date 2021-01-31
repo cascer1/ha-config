@@ -38,3 +38,8 @@
     entities:
       - light.upstairs
       - light.downstairs
+  - platform: group
+    name: TV
+    entities:
+      - light.living_room_ceiling
+      - light.living_room_corner

@@ -27,6 +27,18 @@
       friendly_name: 'Power Flow'
       unit_of_measurement: 'W'
       value_template: "{{ states('sensor.power_consumption_watt')|float - states('sensor.power_production_watt')|float }}"
+    energy_production_daily_total_watt:
+      friendly_name: 'Energy Production'
+      unit_of_measurement: "Wh"
+      value_template: "{{ (states('sensor.energy_production_daily_total_meter') | float) * 1000 | round(0) }}"
+    energy_consumption_daily_total_watt:
+      friendly_name: 'Energy Consumption'
+      unit_of_measurement: "Wh"
+      value_template: "{{ (states('sensor.energy_daily_total_meter') | float) * 1000 | round(0) }}"
+    solar_energy_daily_watthour:
+      friendly_name: 'Solar Energy Today'
+      unit_of_measurement: 'kWh'
+      value_template: "{{ (states('sensor.solaredge_energy_today') | float) / 1000 | round(3) }}"
 - platform: statistics
   name: average_consumption
   entity_id: sensor.power_consumption_watt

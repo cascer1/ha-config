@@ -34,7 +34,7 @@ lights_not_home:
           below: input_number.sun_elevation_dark
         - condition: time
           after: '12:00:00'
-          before: '22:59:59'
+          before: input_datetime.night_time
       sequence:
       - scene: scene.away
     default:
@@ -56,3 +56,59 @@ lights_home:
       - scene: scene.relax
     default:
     - scene: scene.home
+home_music:
+  alias: Home Music
+  sequence:
+  - service: media_player.volume_set
+    entity_id: media_player.living_room_sonos
+    data:
+      volume_level: '{{ states(''input_number.home_music_volume_level'') }}'
+  - service: media_player.shuffle_set
+    data:
+      shuffle: true
+    entity_id: media_player.living_room_sonos
+  - service: media_player.repeat_set
+    data:
+      repeat: all
+    entity_id: media_player.living_room_sonos
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: person.cas_eliens
+        state: home
+      sequence:
+      - service: media_player.select_source
+        entity_id: media_player.living_room_sonos
+        data:
+          source: '{{ states(''input_text.home_music_source_cas'') }}'
+    default:
+    - service: media_player.select_source
+      entity_id: media_player.living_room_sonos
+      data:
+        source: '{{ states(''input_text.home_music_source_bert'') }}'
+  mode: single
+  icon: mdi:music
+wake_up:
+  alias: Wake Up
+  icon: mdi:alarm
+  sequence:
+  - service: script.morning_music
+  - service: input_boolean.turn_on
+    entity_id: input_boolean.woken_up
+morning_music:
+  alias: Morning Music
+  icon: mdi:music
+  sequence:
+  - service: media_player.select_source
+    entity_id: media_player.living_room_sonos
+    data:
+      source: '{{ states(''input_text.morning_music_source'') }}'
+  - service: media_player.shuffle_set
+    data:
+      shuffle: true
+    entity_id: media_player.living_room_sonos
+  - service: media_player.repeat_set
+    data:
+      repeat: all
+    entity_id: media_player.living_room_sonos
+  mode: single

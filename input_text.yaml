@@ -1,0 +1,12 @@
+home_music_source_bert:
+  name: "Bert Home Music"
+  initial: 'Soul Cuisine'
+  icon: mdi:music
+home_music_source_cas:
+  name: "Cas Home Music"
+  initial: '''t Koffiehuis'
+  icon: mdi:music
+morning_music_source:
+  name: "Morning Music Source"
+  initial: '''t Koffiehuis'
+  icon: mdi:music

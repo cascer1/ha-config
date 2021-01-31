@@ -1,34 +1,30 @@
 - id: dim_lights_tv
-  alias: Dim lights when watching TV
+  alias: Watching TV
   description: ''
   trigger:
   - platform: state
     entity_id: media_player.plex_plex_for_android_tv_living_room_tv
     to: playing
-  - platform: state
-    entity_id: media_player.living_room_tv
-    to: playing
-  condition:
-  - condition: state
-    entity_id: light.living_room
-    state: 'on'
+  action:
+  - service: media_player.media_pause
+    entity_id: media_player.living_room_sonos
   - condition: numeric_state
     entity_id: sun.sun
     attribute: elevation
     below: '-2.0'
-  action:
+  - condition: state
+    entity_id: light.living_room
+    state: 'on'
   - scene: scene.watching_tv
-  
+  - service: input_boolean.turn_off
+    entity_id: input_boolean.enable_circadian_downstairs
+  mode: single
 - id: reset_lights_tv
   alias: Reset lights when pausing TV
   description: ''
   trigger:
   - platform: state
     entity_id: media_player.plex_plex_for_android_tv_living_room_tv
-    from: playing
-    for: 00:00:05
-  - platform: state
-    entity_id: media_player.living_room_tv
     from: playing
     for: 00:00:05
   condition:
@@ -41,10 +37,12 @@
     below: input_number.sun_elevation_dark
   action:
   - scene: scene.relax
-  
+  - service: input_boolean.turn_on
+    entity_id: input_boolean.enable_circadian_downstairs
+  mode: single
 - id: thermostat_down_away
   alias: Thermostat low while away
-  description: 'Keep the thermostat temperature down while away'
+  description: Keep the thermostat temperature down while away
   trigger:
   - platform: state
     entity_id: climate.tstat_8d728f
@@ -54,10 +52,10 @@
     entity_id: group.awesome_people
     state: not_home
   - condition: template
-    value_template: '{{ (state_attr(''climate.tstat_8d728f'', ''temperature'')|float) > (states(''input_number.away_temperature'') | float) }}'
+    value_template: '{{ (state_attr(''climate.tstat_8d728f'', ''temperature'')|float)
+      > (states(''input_number.away_temperature'') | float) }}'
   action:
   - service: script.thermostat_away
-  
 - id: leaving_home
   alias: Leaving home
   description: Turn down the thermostat and turn off the lights when everyone leaves
@@ -71,7 +69,8 @@
   action:
   - service: script.lights_not_home
   - service: script.thermostat_away
-
+  - service: media_player.media_stop
+    entity_id: media_player.living_room_sonos
 - id: returning_home
   alias: Returning home
   description: Turn up the thermostat and turn on the lights when someone comes home
@@ -82,14 +81,12 @@
     to: home
   action:
   - service: script.lights_home
-  - choose:
-    - conditions:
-      - condition: time
-        after: 06:00:00
-        before: '22:00:00'
-      sequence:
-      - service: script.thermostat_home
-
+  - condition: time
+    after: input_datetime.morning_time
+    before: input_datetime.night_time
+  - service: script.thermostat_home
+  - service: script.home_music
+  mode: single
 - id: office_lights_on
   alias: Office lights on
   description: Turn on the office lights when a computer is turned on.
@@ -100,12 +97,18 @@
   - platform: state
     entity_id: binary_sensor.cas_desktop
     to: 'on'
+  condition:
+  - condition: device
+    type: is_off
+    device_id: fc2a86e47b35a06a62f296f0ddb199a5
+    entity_id: light.office_ceiling
+    domain: light
   action:
   - service: light.turn_on
     entity_id: light.office
-
+  mode: single
 - id: sun_setting
-  alias: 'Sun setting'
+  alias: Sun setting
   description: ''
   trigger:
   - platform: sun
@@ -116,16 +119,17 @@
     entity_id: light.downstairs
     state: 'off'
   action:
-    - service: script.lights_{{states('group.awesome_people')}}
-
+  - service: script.lights_{{states('group.awesome_people')}}
+  mode: single
 - id: lights_off_away
   alias: lights off when away
-  description: 'Turn off the lights when nobody is home at night'
+  description: Turn off the lights when nobody is home at night
   trigger:
   - platform: time
-    at: '23:00'
+    at: input_datetime.night_time
   - platform: template
-    value_template: '{{ states(''sun.sun.elevation'') > states(''input_number.sun_elevation_dark'') }}'
+    value_template: '{{ states(''sun.sun.elevation'') > states(''input_number.sun_elevation_dark'')
+      }}'
   condition:
   - condition: state
     entity_id: group.awesome_people
@@ -133,7 +137,7 @@
   action:
   - service: light.turn_off
     entity_id: light.everywhere
-
+  mode: single
 - id: store_daily_utility_usage
   alias: Store daily utility usage
   trigger:
@@ -145,7 +149,6 @@
       message: ',{{states.sensor.energy_daily_low_meter.state}},{{states.sensor.energy_daily_high_meter.state}},{{states.sensor.energy_production_daily_low_meter.state}},{{states.sensor.energy_production_daily_high_meter.state}},{{(states.sensor.solaredge_energy_today.state
         | float)/1000}},{{states.sensor.gas_daily_meter.state}}'
   initial_state: 'true'
-
 - id: store_monthly_utility_usage
   alias: Store monthly utility usage
   trigger:
@@ -160,3 +163,65 @@
       message: ',{{states.sensor.energy_monthly_low_meter.state}},{{states.sensor.energy_monthly_high_meter.state}},{{states.sensor.energy_production_monthly_low_meter.state}},{{states.sensor.energy_production_monthly_high_meter.state}},{{(states.sensor.solar_monthly_meter.state
         | float)/1000}},{{states.sensor.gas_monthly_meter.state}}'
   initial_state: 'true'
+- id: lights_off_at_night
+  alias: Sonos off at night
+  trigger:
+  - platform: state
+    entity_id: light.downstairs
+    from: 'on'
+    to: 'off'
+  - platform: time
+    at: input_datetime.night_time
+  condition:
+  - condition: time
+    after: input_datetime.evening_time
+  - condition: state
+    entity_id: light.downstairs
+    state: 'off'
+  action:
+  - service: media_player.media_pause
+    entity_id: media_player.living_room_sonos
+  mode: single
+- id: thermostat_off_at_night
+  alias: Thermostat off at night
+  description: Turn off the thermostat after all the lights are turned off at night
+  trigger:
+  - platform: state
+    entity_id: light.everywhere
+    from: 'on'
+    to: 'off'
+    for: 00:05:00
+  condition:
+  - condition: time
+    after: input_datetime.evening_time
+  action:
+  - service: script.thermostat_away
+  mode: single
+- id: good_morning
+  alias: Good Morning
+  description: Triggers when first activity is detected downstairs
+  trigger:
+  - platform: state
+    entity_id: light.downstairs
+    from: 'off'
+    to: 'on'
+  condition:
+  - condition: and
+    conditions:
+    - condition: time
+      after: input_datetime.morning_time
+    - condition: state
+      entity_id: input_boolean.woken_up
+      state: 'off'
+  action:
+  - service: script.wake_up
+  mode: single
+- id: reset_states
+  alias: Reset states
+  description: Reset states for daily events
+  trigger:
+  - platform: time
+    at: 03:00:00
+  action:
+  - service: input_boolean.turn_off
+    entity_id: input_boolean.woken_up

@@ -1,0 +1,8 @@
+woken_up:
+  name: Wake up actions performed (auto)
+  initial: false
+  icon: mdi:alarm
+enable_circadian_downstairs:
+  name: Enable Circadian downstairs
+  initial: true
+  icon: mdi:theme-light-dark

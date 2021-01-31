@@ -9,15 +9,15 @@
       - random
       brightness: 105
       hs_color:
-      - 35.714
-      - 65.882
+      - 35.21
+      - 65.49
       rgb_color:
       - 255
       - 186
-      - 87
+      - 88
       xy_color:
       - 0.503
-      - 0.411
+      - 0.41
       effect: none
       friendly_name: living room ceiling
       supported_features: 63
@@ -30,15 +30,15 @@
       - random
       brightness: 112
       hs_color:
-      - 35.858
+      - 35.503
       - 66.275
       rgb_color:
       - 255
-      - 186
+      - 185
       - 85
       xy_color:
-      - 0.504
-      - 0.412
+      - 0.506
+      - 0.411
       effect: none
       friendly_name: living room corner
       supported_features: 63
@@ -64,15 +64,15 @@
       - random
       brightness: 156
       hs_color:
-      - 35.714
-      - 65.882
+      - 35.21
+      - 65.49
       rgb_color:
       - 255
       - 186
-      - 87
+      - 88
       xy_color:
       - 0.503
-      - 0.411
+      - 0.41
       effect: none
       friendly_name: Dining table up
       supported_features: 63
@@ -86,6 +86,11 @@
       friendly_name: Dining table down
       supported_features: 63
       state: 'off'
+    input_boolean.enable_circadian_downstairs:
+      editable: false
+      friendly_name: Enable Circadian downstairs
+      icon: mdi:theme-light-dark
+      state: 'off'
   icon: mdi:youtube-tv
 - id: '1609427916089'
   name: Relax
@@ -98,15 +103,15 @@
       - random
       brightness: 145
       hs_color:
-      - 36.568
+      - 36.213
       - 66.275
       rgb_color:
       - 255
-      - 188
+      - 187
       - 85
       xy_color:
-      - 0.502
-      - 0.414
+      - 0.503
+      - 0.413
       effect: none
       friendly_name: Dining table down
       supported_features: 63
@@ -119,15 +124,15 @@
       - random
       brightness: 145
       hs_color:
-      - 36.568
+      - 36.213
       - 66.275
       rgb_color:
       - 255
-      - 188
+      - 187
       - 85
       xy_color:
-      - 0.502
-      - 0.414
+      - 0.503
+      - 0.413
       effect: none
       friendly_name: Dining table up
       supported_features: 63
@@ -153,15 +158,15 @@
       - random
       brightness: 145
       hs_color:
-      - 36.568
+      - 36.213
       - 66.275
       rgb_color:
       - 255
-      - 188
+      - 187
       - 85
       xy_color:
-      - 0.502
-      - 0.414
+      - 0.503
+      - 0.413
       effect: none
       friendly_name: living room ceiling
       supported_features: 63
@@ -174,19 +179,24 @@
       - random
       brightness: 145
       hs_color:
-      - 36.568
+      - 36.213
       - 66.275
       rgb_color:
       - 255
-      - 188
+      - 187
       - 85
       xy_color:
-      - 0.502
-      - 0.414
+      - 0.503
+      - 0.413
       effect: none
       friendly_name: living room corner
       supported_features: 63
       state: 'on'
+    input_boolean.enable_circadian_downstairs:
+      editable: false
+      friendly_name: Enable Circadian downstairs
+      icon: mdi:theme-light-dark
+      state: 'off'
   icon: mdi:book-music
 - id: '1609877766008'
   name: away
@@ -290,39 +300,38 @@
       friendly_name: Dining table down
       supported_features: 63
       state: 'on'
+    input_boolean.enable_circadian_downstairs:
+      editable: false
+      friendly_name: Enable Circadian downstairs
+      icon: mdi:theme-light-dark
+      state: 'on'
+  icon: mdi:home-lightbulb-outline
+- id: '1611866793539'
+  name: Dining
+  entities:
+    light.dining_table_down:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      - random
+      brightness: 145
+      color_temp: 371
+      effect: none
+      friendly_name: Dining table down
+      supported_features: 63
+      state: 'on'
     light.dining_table_up:
       min_mireds: 153
       max_mireds: 500
       effect_list:
       - colorloop
       - random
-      brightness: 255
-      hs_color:
-      - 38.667
-      - 52.941
-      rgb_color:
-      - 255
-      - 207
-      - 120
-      xy_color:
-      - 0.457
-      - 0.41
+      brightness: 163
+      color_temp: 382
       effect: none
       friendly_name: Dining table up
       supported_features: 63
-      state: 'on'
-    light.kitchen_cabinets:
-      brightness: 255
-      friendly_name: Kitchen Cabinets
-      supported_features: 41
-      state: 'on'
-    light.kitchen_ceiling:
-      min_mireds: 153
-      max_mireds: 454
-      brightness: 255
-      color_temp: 366
-      friendly_name: Kitchen ceiling
-      supported_features: 43
       state: 'on'
     light.living_room_ceiling:
       min_mireds: 153
@@ -330,17 +339,8 @@
       effect_list:
       - colorloop
       - random
-      brightness: 255
-      hs_color:
-      - 38.667
-      - 52.941
-      rgb_color:
-      - 255
-      - 207
-      - 120
-      xy_color:
-      - 0.457
-      - 0.41
+      brightness: 115
+      color_temp: 385
       effect: none
       friendly_name: living room ceiling
       supported_features: 63
@@ -351,19 +351,28 @@
       effect_list:
       - colorloop
       - random
-      brightness: 255
-      hs_color:
-      - 38.667
-      - 52.941
-      rgb_color:
-      - 255
-      - 207
-      - 120
-      xy_color:
-      - 0.457
-      - 0.41
+      brightness: 140
+      color_temp: 374
       effect: none
       friendly_name: living room corner
       supported_features: 63
       state: 'on'
-  icon: mdi:home-lightbulb-outline
+    light.kitchen_ceiling:
+      min_mireds: 153
+      max_mireds: 454
+      brightness: 133
+      color_temp: 333
+      friendly_name: Kitchen ceiling
+      supported_features: 43
+      state: 'on'
+    light.kitchen_cabinets:
+      brightness: 254
+      friendly_name: Kitchen Cabinets
+      supported_features: 41
+      state: 'on'
+    input_boolean.enable_circadian_downstairs:
+      editable: false
+      friendly_name: Enable Circadian downstairs
+      icon: mdi:theme-light-dark
+      state: 'off'
+  icon: mdi:silverware-fork-knife

@@ -1,0 +1,15 @@
+evening_time:
+  name: Evening time threshold
+  has_date: false
+  has_time: true
+  initial: '21:30'
+night_time:
+  name: Night time threshold
+  has_date: false
+  has_time: true
+  initial: '22:00'
+morning_time:
+  name: Morning time threshold
+  has_date: false
+  has_time: true
+  initial: '06:00'
