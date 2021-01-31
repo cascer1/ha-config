@@ -1,0 +1,19 @@
+# Core HA files
+.HA_VERSION
+.cache
+.cloud
+.storage
+deps
+image
+packages
+tts
+www
+custom_components
+
+
+# Sensitive files
+google_calendars.yaml
+secrets.yaml
+*.db
+*.log
+*.token
