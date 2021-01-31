@@ -16,5 +16,9 @@ Ideas on fun home automation projects I guess? idk it's just a backup.
 * A Lovelace view that perfectly fits on my phone screen to turn on the lights & music
 * Some scripts that I've written because HA doesn't have easily toggleable entities
 
+## Where do I start?
+
+`configuration.yaml` probably. 
+
 ## I still have questions
 email me at homeassistant [at] cascer1 [dot] space, I guess. Though if it's related to HA I probably won't be able to help.
