@@ -1,4 +1,4 @@
-- id: '1609312959162'
+- id: watching_tv
   name: Watching TV
   entities:
     light.living_room_ceiling:
@@ -103,15 +103,15 @@
       - random
       brightness: 145
       hs_color:
-      - 36.213
+      - 35.858
       - 66.275
       rgb_color:
       - 255
-      - 187
+      - 186
       - 85
       xy_color:
-      - 0.503
-      - 0.413
+      - 0.504
+      - 0.412
       effect: none
       friendly_name: Dining table down
       supported_features: 63
@@ -124,15 +124,15 @@
       - random
       brightness: 145
       hs_color:
-      - 36.213
+      - 35.858
       - 66.275
       rgb_color:
       - 255
-      - 187
+      - 186
       - 85
       xy_color:
-      - 0.503
-      - 0.413
+      - 0.504
+      - 0.412
       effect: none
       friendly_name: Dining table up
       supported_features: 63
@@ -158,15 +158,15 @@
       - random
       brightness: 145
       hs_color:
-      - 36.213
+      - 35.858
       - 66.275
       rgb_color:
       - 255
-      - 187
+      - 186
       - 85
       xy_color:
-      - 0.503
-      - 0.413
+      - 0.504
+      - 0.412
       effect: none
       friendly_name: living room ceiling
       supported_features: 63
@@ -179,24 +179,19 @@
       - random
       brightness: 145
       hs_color:
-      - 36.213
+      - 35.858
       - 66.275
       rgb_color:
       - 255
-      - 187
+      - 186
       - 85
       xy_color:
-      - 0.503
-      - 0.413
+      - 0.504
+      - 0.412
       effect: none
       friendly_name: living room corner
       supported_features: 63
       state: 'on'
-    input_boolean.enable_circadian_downstairs:
-      editable: false
-      friendly_name: Enable Circadian downstairs
-      icon: mdi:theme-light-dark
-      state: 'off'
   icon: mdi:book-music
 - id: '1609877766008'
   name: away
@@ -275,6 +270,11 @@
       friendly_name: living room corner
       supported_features: 63
       state: 'on'
+    input_boolean.enable_circadian_downstairs:
+      editable: false
+      friendly_name: Enable Circadian downstairs
+      icon: mdi:theme-light-dark
+      state: 'off'
   icon: mdi:home-remove-outline
 - id: '1611403761959'
   name: home
@@ -304,6 +304,55 @@
       editable: false
       friendly_name: Enable Circadian downstairs
       icon: mdi:theme-light-dark
+      state: 'on'
+    light.dining_table_up:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      - random
+      brightness: 254
+      color_temp: 346
+      effect: none
+      friendly_name: Dining table up
+      supported_features: 63
+      state: 'on'
+    light.kitchen_ceiling:
+      min_mireds: 153
+      max_mireds: 454
+      brightness: 254
+      color_temp: 346
+      friendly_name: Kitchen ceiling
+      supported_features: 43
+      state: 'on'
+    light.kitchen_cabinets:
+      brightness: 254
+      friendly_name: Kitchen Cabinets
+      supported_features: 41
+      state: 'on'
+    light.living_room_ceiling:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      - random
+      brightness: 254
+      color_temp: 346
+      effect: none
+      friendly_name: living room ceiling
+      supported_features: 63
+      state: 'on'
+    light.living_room_corner:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      - random
+      brightness: 254
+      color_temp: 346
+      effect: none
+      friendly_name: living room corner
+      supported_features: 63
       state: 'on'
   icon: mdi:home-lightbulb-outline
 - id: '1611866793539'

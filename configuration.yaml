@@ -18,6 +18,8 @@ http:
 # Learn more at https://www.home-assistant.io/integrations/default_config
 default_config:
 
+conversation:
+
 circadian_lighting:
   min_colortemp: 2500
   max_colortemp: 4500
@@ -25,6 +27,14 @@ circadian_lighting:
 # Text to speech
 tts:
   - platform: google_translate
+
+media_player:
+  - platform: philips_android_tv
+    name: TV
+    host: !secret tv_host
+    mac: !secret tv_mac
+    username: !secret tv_username
+    password: !secret tv_password
 
 recorder:
   commit_interval: 10
@@ -57,10 +67,6 @@ history:
       - input_*
       - automation
 
-google:
-  client_id: !secret google_client_id
-  client_secret: !secret google_client_secret
-
 spotify:
   client_id: !secret spotify_client_id
   client_secret: !secret spotify_client_secret
@@ -71,7 +77,6 @@ script: !include scripts.yaml
 scene: !include scenes.yaml
 binary_sensor: !include binary_sensors.yaml
 light: !include lights.yaml
-device_tracker: !include trackers.yaml
 sensor: !include sensors.yaml
 notify: !include notify.yaml
 utility_meter: !include utility_meter.yaml

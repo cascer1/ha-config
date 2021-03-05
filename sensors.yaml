@@ -62,4 +62,4 @@
   entity_id: sensor.hourly_gas_consumption
   precision: 3
   max_age:
-    minutes: 30
+    minutes: 45

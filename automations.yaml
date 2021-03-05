@@ -11,13 +11,11 @@
   - condition: numeric_state
     entity_id: sun.sun
     attribute: elevation
-    below: '-2.0'
+    below: input_number.sun_elevation_dark
   - condition: state
     entity_id: light.living_room
     state: 'on'
-  - scene: scene.watching_tv
-  - service: input_boolean.turn_off
-    entity_id: input_boolean.enable_circadian_downstairs
+  - scene: scene.watching_tv_2
   mode: single
 - id: reset_lights_tv
   alias: Reset lights when pausing TV
@@ -111,9 +109,9 @@
   alias: Sun setting
   description: ''
   trigger:
-  - platform: sun
-    event: sunset
-    offset: -00:30:00
+  - platform: template
+    value_template: '{{ states(''sun.sun.elevation'') < states(''input_number.sun_elevation_dark'')
+      }}'
   condition:
   - condition: state
     entity_id: light.downstairs
@@ -196,6 +194,9 @@
     after: input_datetime.evening_time
   action:
   - service: script.thermostat_away
+  - service: media_player.media_pause
+    data: {}
+    entity_id: media_player.living_room_sonos
   mode: single
 - id: good_morning
   alias: Good Morning
@@ -225,3 +226,7 @@
   action:
   - service: input_boolean.turn_off
     entity_id: input_boolean.woken_up
+  - service: light.turn_off
+    data: {}
+    entity_id: light.downstairs
+  mode: single
