@@ -1,20 +1,4 @@
 - platform: file
-  name: energydaily
-  filename: /mnt/logs/energy_usage_daily.csv
-  timestamp: true
-- platform: file
-  name: energymonthly
-  filename: /mnt/logs/energy_usage_monthly.csv
-  timestamp: true
-- platform: file
-  name: gasdaily
-  filename: /mnt/logs/gas_usage_daily.csv
-  timestamp: true
-- platform: file
-  name: gasmonthly
-  filename: /mnt/logs/gas_usage_monthly.csv
-  timestamp: true
-- platform: file
   name: utilitydaily
   filename: /mnt/logs/utility_daily.csv
   timestamp: true
