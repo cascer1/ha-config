@@ -103,15 +103,15 @@
       - random
       brightness: 145
       hs_color:
-      - 35.858
+      - 35.503
       - 66.275
       rgb_color:
       - 255
-      - 186
+      - 185
       - 85
       xy_color:
-      - 0.504
-      - 0.412
+      - 0.506
+      - 0.411
       effect: none
       friendly_name: Dining table down
       supported_features: 63
@@ -124,15 +124,15 @@
       - random
       brightness: 145
       hs_color:
-      - 35.858
+      - 35.503
       - 66.275
       rgb_color:
       - 255
-      - 186
+      - 185
       - 85
       xy_color:
-      - 0.504
-      - 0.412
+      - 0.506
+      - 0.411
       effect: none
       friendly_name: Dining table up
       supported_features: 63
@@ -158,15 +158,15 @@
       - random
       brightness: 145
       hs_color:
-      - 35.858
+      - 35.503
       - 66.275
       rgb_color:
       - 255
-      - 186
+      - 185
       - 85
       xy_color:
-      - 0.504
-      - 0.412
+      - 0.506
+      - 0.411
       effect: none
       friendly_name: living room ceiling
       supported_features: 63
@@ -179,18 +179,23 @@
       - random
       brightness: 145
       hs_color:
-      - 35.858
+      - 35.503
       - 66.275
       rgb_color:
       - 255
-      - 186
+      - 185
       - 85
       xy_color:
-      - 0.504
-      - 0.412
+      - 0.506
+      - 0.411
       effect: none
       friendly_name: living room corner
       supported_features: 63
+      state: 'on'
+    input_boolean.enable_circadian_downstairs:
+      editable: false
+      friendly_name: Enable Circadian downstairs
+      icon: mdi:theme-light-dark
       state: 'on'
   icon: mdi:book-music
 - id: '1609877766008'

@@ -46,6 +46,7 @@ lights_home:
   icon: mdi:lamp
   mode: single
   sequence:
+  - scene: scene.home
   - choose:
     - conditions:
       - condition: numeric_state
@@ -54,8 +55,7 @@ lights_home:
         below: input_number.sun_elevation_dark
       sequence:
       - scene: scene.relax
-    default:
-    - scene: scene.home
+    default: []
 home_music:
   alias: Home Music
   sequence:
@@ -107,21 +107,23 @@ morning_music:
     entity_id: media_player.living_room_sonos
     data:
       source: '{{ states(''input_text.morning_music_source'') }}'
-  - service: media_player.shuffle_set
-    data:
-      shuffle: true
-    entity_id: media_player.living_room_sonos
   - service: media_player.repeat_set
     data:
       repeat: all
     entity_id: media_player.living_room_sonos
-  mode: single
-bedroom_fade_off:
-  alias: Bedroom fade off
-  sequence:
-  - service: light.turn_off
+  - service: media_player.shuffle_set
     data:
-      transition: 1800
-    entity_id: light.bedroom
+      shuffle: true
+    entity_id: media_player.living_room_sonos
+  mode: single
+bedroom_fade_on:
+  alias: Bedroom fade on
+  sequence:
+  - service: light.turn_on
+    data:
+      transition: 300
+      color_temp: 272
+    target:
+      entity_id: light.bedroom
   mode: single
   icon: mdi:bed
