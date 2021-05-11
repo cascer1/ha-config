@@ -6,8 +6,6 @@ homeassistant:
   customize: !include customize.yaml
   # https://www.home-assistant.io/docs/configuration/packages/#create-a-packages-folder
   packages: !include_dir_named packages
-  media_dirs:
-    music: /mnt/music
 
 http:
   # https://www.home-assistant.io/integrations/http/#ip_ban_enabled
@@ -18,23 +16,9 @@ http:
 # Learn more at https://www.home-assistant.io/integrations/default_config
 default_config:
 
-conversation:
-
-circadian_lighting:
-  min_colortemp: 2500
-  max_colortemp: 4500
-
 # Text to speech
 tts:
   - platform: google_translate
-
-media_player:
-  - platform: philips_android_tv
-    name: TV
-    host: !secret tv_host
-    mac: !secret tv_mac
-    username: !secret tv_username
-    password: !secret tv_password
 
 recorder:
   commit_interval: 10
@@ -84,4 +68,3 @@ input_number: !include input_numbers.yaml
 input_text: !include input_text.yaml
 input_datetime: !include input_datetime.yaml
 input_boolean: !include input_boolean.yaml
-switch: !include switches.yaml

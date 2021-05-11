@@ -15,5 +15,9 @@ custom_components
 google_calendars.yaml
 secrets.yaml
 *.db
+*.db-shm
+*.db-wal
 *.log
 *.token
+ip_bans.yaml
+media

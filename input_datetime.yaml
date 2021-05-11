@@ -6,6 +6,10 @@ night_time:
   name: Night time threshold
   has_date: false
   has_time: true
+deep_night_time:
+  name: Deep night time threshold
+  has_date: false
+  has_time: true
 morning_time:
   name: Morning time threshold
   has_date: false

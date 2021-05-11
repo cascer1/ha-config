@@ -7,6 +7,10 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
       brightness: 105
       hs_color:
       - 35.21
@@ -28,17 +32,21 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
       brightness: 112
       hs_color:
-      - 35.503
-      - 66.275
+      - 35.294
+      - 66.667
       rgb_color:
       - 255
-      - 185
-      - 85
+      - 184
+      - 84
       xy_color:
-      - 0.506
-      - 0.411
+      - 0.507
+      - 0.41
       effect: none
       friendly_name: living room corner
       supported_features: 63
@@ -46,12 +54,18 @@
     light.kitchen_ceiling:
       min_mireds: 153
       max_mireds: 454
+      supported_color_modes:
+      - color_temp
+      color_mode: color_temp
       brightness: 51
       color_temp: 443
       friendly_name: Kitchen ceiling
       supported_features: 43
       state: 'on'
     light.kitchen_cabinets:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
       brightness: 120
       friendly_name: Kitchen Cabinets
       supported_features: 41
@@ -62,17 +76,21 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
       brightness: 156
       hs_color:
-      - 35.21
-      - 65.49
+      - 35.06
+      - 65.098
       rgb_color:
       - 255
-      - 186
-      - 88
+      - 185
+      - 89
       xy_color:
       - 0.503
-      - 0.41
+      - 0.408
       effect: none
       friendly_name: Dining table up
       supported_features: 63
@@ -83,12 +101,21 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
       friendly_name: Dining table down
       supported_features: 63
       state: 'off'
-    input_boolean.enable_circadian_downstairs:
-      editable: false
-      friendly_name: Enable Circadian downstairs
+    switch.adaptive_lighting_downstairs:
+      brightness_pct:
+      color_temp_kelvin:
+      color_temp_mired:
+      rgb_color:
+      xy_color:
+      hs_color:
+      sun_position:
+      friendly_name: 'Adaptive Lighting: Downstairs'
       icon: mdi:theme-light-dark
       state: 'off'
   icon: mdi:youtube-tv
@@ -101,17 +128,21 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
       brightness: 145
       hs_color:
-      - 35.503
+      - 35.148
       - 66.275
       rgb_color:
       - 255
-      - 185
+      - 184
       - 85
       xy_color:
-      - 0.506
-      - 0.411
+      - 0.507
+      - 0.41
       effect: none
       friendly_name: Dining table down
       supported_features: 63
@@ -122,31 +153,32 @@
       effect_list:
       - colorloop
       - random
-      brightness: 145
-      hs_color:
-      - 35.503
-      - 66.275
-      rgb_color:
-      - 255
-      - 185
-      - 85
-      xy_color:
-      - 0.506
-      - 0.411
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
+      brightness: 255
+      color_temp: 238
       effect: none
       friendly_name: Dining table up
       supported_features: 63
       state: 'on'
     light.kitchen_cabinets:
-      brightness: 145
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 255
       friendly_name: Kitchen Cabinets
       supported_features: 41
       state: 'on'
     light.kitchen_ceiling:
       min_mireds: 153
       max_mireds: 454
-      brightness: 145
-      color_temp: 443
+      supported_color_modes:
+      - color_temp
+      color_mode: color_temp
+      brightness: 255
+      color_temp: 238
       friendly_name: Kitchen ceiling
       supported_features: 43
       state: 'on'
@@ -156,17 +188,12 @@
       effect_list:
       - colorloop
       - random
-      brightness: 145
-      hs_color:
-      - 35.503
-      - 66.275
-      rgb_color:
-      - 255
-      - 185
-      - 85
-      xy_color:
-      - 0.506
-      - 0.411
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
+      brightness: 255
+      color_temp: 238
       effect: none
       friendly_name: living room ceiling
       supported_features: 63
@@ -177,24 +204,33 @@
       effect_list:
       - colorloop
       - random
-      brightness: 145
-      hs_color:
-      - 35.503
-      - 66.275
-      rgb_color:
-      - 255
-      - 185
-      - 85
-      xy_color:
-      - 0.506
-      - 0.411
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
+      brightness: 255
+      color_temp: 238
       effect: none
       friendly_name: living room corner
       supported_features: 63
       state: 'on'
-    input_boolean.enable_circadian_downstairs:
-      editable: false
-      friendly_name: Enable Circadian downstairs
+    switch.adaptive_lighting_downstairs:
+      brightness_pct: 100
+      color_temp_kelvin: 4185.600049747519
+      color_temp_mired: 238
+      rgb_color:
+      - 255
+      - 210.32780101226115
+      - 174.39634720244464
+      xy_color:
+      - 0.409
+      - 0.362
+      hs_color:
+      - 26.667
+      - 31.765
+      sun_position: 0.8428000248737595
+      manual_control: []
+      friendly_name: 'Adaptive Lighting: Downstairs'
       icon: mdi:theme-light-dark
       state: 'on'
   icon: mdi:book-music
@@ -290,6 +326,10 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
       brightness: 255
       hs_color:
       - 38.667
@@ -305,17 +345,16 @@
       friendly_name: Dining table down
       supported_features: 63
       state: 'on'
-    input_boolean.enable_circadian_downstairs:
-      editable: false
-      friendly_name: Enable Circadian downstairs
-      icon: mdi:theme-light-dark
-      state: 'on'
     light.dining_table_up:
       min_mireds: 153
       max_mireds: 500
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
       brightness: 254
       color_temp: 346
       effect: none
@@ -325,12 +364,18 @@
     light.kitchen_ceiling:
       min_mireds: 153
       max_mireds: 454
+      supported_color_modes:
+      - color_temp
+      color_mode: color_temp
       brightness: 254
       color_temp: 346
       friendly_name: Kitchen ceiling
       supported_features: 43
       state: 'on'
     light.kitchen_cabinets:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
       brightness: 254
       friendly_name: Kitchen Cabinets
       supported_features: 41
@@ -341,6 +386,10 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
       brightness: 254
       color_temp: 346
       effect: none
@@ -353,11 +402,34 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
       brightness: 254
       color_temp: 346
       effect: none
       friendly_name: living room corner
       supported_features: 63
+      state: 'on'
+    switch.adaptive_lighting_downstairs:
+      brightness_pct: 100
+      color_temp_kelvin: 4185.600049747519
+      color_temp_mired: 238
+      rgb_color:
+      - 255
+      - 210.32780101226115
+      - 174.39634720244464
+      xy_color:
+      - 0.409
+      - 0.362
+      hs_color:
+      - 26.667
+      - 31.765
+      sun_position: 0.8428000248737595
+      manual_control: []
+      friendly_name: 'Adaptive Lighting: Downstairs'
+      icon: mdi:theme-light-dark
       state: 'on'
   icon: mdi:home-lightbulb-outline
 - id: '1611866793539'
@@ -369,6 +441,10 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
       brightness: 145
       color_temp: 371
       effect: none
@@ -381,6 +457,10 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
       brightness: 163
       color_temp: 382
       effect: none
@@ -393,6 +473,10 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
       brightness: 115
       color_temp: 385
       effect: none
@@ -405,6 +489,10 @@
       effect_list:
       - colorloop
       - random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
       brightness: 140
       color_temp: 374
       effect: none
@@ -414,19 +502,31 @@
     light.kitchen_ceiling:
       min_mireds: 153
       max_mireds: 454
+      supported_color_modes:
+      - color_temp
+      color_mode: color_temp
       brightness: 133
       color_temp: 333
       friendly_name: Kitchen ceiling
       supported_features: 43
       state: 'on'
     light.kitchen_cabinets:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
       brightness: 254
       friendly_name: Kitchen Cabinets
       supported_features: 41
       state: 'on'
-    input_boolean.enable_circadian_downstairs:
-      editable: false
-      friendly_name: Enable Circadian downstairs
+    switch.adaptive_lighting_downstairs:
+      brightness_pct:
+      color_temp_kelvin:
+      color_temp_mired:
+      rgb_color:
+      xy_color:
+      hs_color:
+      sun_position:
+      friendly_name: 'Adaptive Lighting: Downstairs'
       icon: mdi:theme-light-dark
       state: 'off'
   icon: mdi:silverware-fork-knife

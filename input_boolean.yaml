@@ -1,6 +1,6 @@
 woken_up:
   name: Wake up actions performed (auto)
   icon: mdi:alarm
-enable_circadian_downstairs:
-  name: Enable Circadian downstairs
-  icon: mdi:theme-light-dark
+night_time:
+  name: Night Time (auto)
+  icon: hass:weather-night

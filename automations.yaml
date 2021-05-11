@@ -1,4 +1,4 @@
-- id: dim_lights_tv
+- id: watching_tv
   alias: Watching TV
   description: ''
   trigger:
@@ -8,35 +8,6 @@
   action:
   - service: media_player.media_pause
     entity_id: media_player.living_room_sonos
-  - condition: numeric_state
-    entity_id: sun.sun
-    attribute: elevation
-    below: input_number.sun_elevation_dark
-  - condition: state
-    entity_id: light.living_room
-    state: 'on'
-  - scene: scene.watching_tv_2
-  mode: single
-- id: reset_lights_tv
-  alias: Reset lights when pausing TV
-  description: ''
-  trigger:
-  - platform: state
-    entity_id: media_player.plex_plex_for_android_tv_living_room_tv
-    from: playing
-    for: 00:00:05
-  condition:
-  - condition: state
-    entity_id: light.living_room
-    state: 'on'
-  - condition: numeric_state
-    entity_id: sun.sun
-    attribute: elevation
-    below: input_number.sun_elevation_dark
-  action:
-  - scene: scene.relax
-  - service: input_boolean.turn_on
-    entity_id: input_boolean.enable_circadian_downstairs
   mode: single
 - id: thermostat_down_away
   alias: Thermostat low while away
@@ -85,37 +56,16 @@
   - service: script.thermostat_home
   - service: script.home_music
   mode: single
-- id: office_lights_on
-  alias: Office lights on
-  description: Turn on the office lights when a computer is turned on.
-  trigger:
-  - platform: state
-    entity_id: binary_sensor.bert_desktop
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.cas_desktop
-    to: 'on'
-  condition:
-  - condition: device
-    type: is_off
-    device_id: fc2a86e47b35a06a62f296f0ddb199a5
-    entity_id: light.office_ceiling
-    domain: light
-  action:
-  - service: light.turn_on
-    entity_id: light.office
-  mode: single
 - id: sun_setting
   alias: Sun setting
   description: ''
   trigger:
-  - platform: numeric_state
-    entity_id: sun.sun
-    attribute: elevation
-    below: input_number.sun_elevation_dark
+  - platform: sun
+    event: sunset
+    offset: -00:30:00
   condition:
   - condition: state
-    entity_id: light.downstairs
+    entity_id: light.everywhere
     state: 'off'
   action:
   - service: script.lights_{{states('group.awesome_people')}}
@@ -163,13 +113,15 @@
       message: ',{{states.sensor.energy_monthly_low_meter.state}},{{states.sensor.energy_monthly_high_meter.state}},{{states.sensor.energy_production_monthly_low_meter.state}},{{states.sensor.energy_production_monthly_high_meter.state}},{{(states.sensor.solar_monthly_meter.state
         | float)/1000}},{{states.sensor.gas_monthly_meter.state}}'
   initial_state: 'true'
-- id: lights_off_at_night
+  mode: single
+- id: sonos_off_at_night
   alias: Sonos off at night
   trigger:
   - platform: state
     entity_id: light.downstairs
     from: 'on'
     to: 'off'
+    for: 00:05:00
   - platform: time
     at: input_datetime.night_time
   condition:
@@ -182,22 +134,26 @@
   - service: media_player.media_pause
     entity_id: media_player.living_room_sonos
   mode: single
-- id: thermostat_off_at_night
-  alias: Thermostat off at night
-  description: Turn off the thermostat after all the lights are turned off at night
+- id: going_to_bed
+  alias: Going to bed
+  description: Turn off the thermostat and sonos after all the lights are turned off at night
   trigger:
   - platform: state
     entity_id: light.everywhere
     from: 'on'
     to: 'off'
     for: 00:05:00
+  - platform: time
+    at: input_datetime.night_time
   condition:
   - condition: time
-    after: input_datetime.evening_time
+    after: input_datetime.night_time
+  - condition: state
+    entity_id: light.everywhere
+    state: 'off'
   action:
   - service: script.thermostat_away
   - service: media_player.media_pause
-    data: {}
     entity_id: media_player.living_room_sonos
   mode: single
 - id: good_morning
@@ -231,4 +187,91 @@
   - service: light.turn_off
     data: {}
     entity_id: light.downstairs
+  mode: single
+- id: night_time_toggle
+  alias: Turn off night mode
+  description: Toggle the time_night input boolean value
+  trigger:
+  - platform: time
+    at: input_datetime.morning_time
+  action:
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.night_time
+  mode: single
+- id: door_bell_pressed
+  alias: doorbell
+  description: ''
+  trigger:
+  - type: powered
+    platform: device
+    device_id: 5bfd9f27f34c77a83fd342bf8f93e7cc
+    entity_id: binary_sensor.shelly1_e8db84d3500b_input
+    domain: binary_sensor
+  action:
+  - service: script.doorbell
+    data:
+      count: 1
+  - delay: 1
+  mode: single
+- id: door_bell_pressed_long
+  alias: Door bell pressed long
+  description: Door bell pressed for 20 seconds
+  trigger:
+  - type: powered
+    platform: device
+    device_id: 5bfd9f27f34c77a83fd342bf8f93e7cc
+    entity_id: binary_sensor.shelly1_e8db84d3500b_input
+    domain: binary_sensor
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 20
+      milliseconds: 0
+  action:
+  - service: light.turn_on
+    target:
+      entity_id: light.everywhere
+    data:
+      flash: long
+  - service: script.doorbell
+    data:
+      count: 5
+  mode: single
+- id: night_mode_on
+  alias: turn on night mode
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: light.everywhere
+    to: 'off'
+    for: 00:05:00
+  - platform: time
+    at: input_datetime.deep_night_time
+  condition:
+  - condition: time
+    after: input_datetime.night_time
+  - condition: state
+    entity_id: light.everywhere
+    state: 'off'
+  action:
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.night_time
+  mode: single
+- id: toggle_sleep_mode
+  alias: Toggle sleep mode
+  description: Toggle sleep mode for adaptive lights
+  trigger:
+  - platform: state
+    entity_id: input_boolean.night_time
+  - platform: homeassistant
+    event: start
+  action:
+  - service: switch.turn_{{ sleep_mode }}
+    entity_id:
+    - switch.adaptive_lighting_sleep_mode_bedroom
+    - switch.adaptive_lighting_sleep_mode_downstairs
+  variables:
+    sleep_mode: '{{ states(''input_boolean.night_time'') }}'
   mode: single
