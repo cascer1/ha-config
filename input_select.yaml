@@ -1,0 +1,6 @@
+climate_mode:
+  name: Climate Mode
+  options:
+    - heat
+    - cool
+    - 'off'

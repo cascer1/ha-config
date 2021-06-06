@@ -6,3 +6,6 @@ sensor.average_production:
   friendly_name: Average Power Production
 sensor.average_consumption_net:
   friendly_name: Average Power Usage
+climate.tstat_8d728f:
+  min_temp: 16
+  max_temp: 30

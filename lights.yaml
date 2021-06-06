@@ -29,17 +29,35 @@
       - light.kitchen_ceiling
       - light.kitchen_cabinets
   - platform: group
+    name: TV
+    entities:
+      - light.living_room_ceiling
+      - light.living_room_corner
+  - platform: group
+    name: Side kitchen
+    entities:
+      - light.side_kitchen_ceiling_1
+      - light.side_kitchen_ceiling_2
+      - light.side_kitchen_window
+      - light.side_kitchen_cabinets
+  - platform: group
     name: Downstairs
     entities:
       - light.kitchen
       - light.living_room
   - platform: group
+    name: Inside
+    entities:
+      - light.downstairs
+      - light.upstairs
+  - platform: group
+    name: Outside
+    entities:
+      - light.side_kitchen
+      - light.garden
+  - platform: group
     name: Everywhere
     entities:
       - light.upstairs
       - light.downstairs
-  - platform: group
-    name: TV
-    entities:
-      - light.living_room_ceiling
-      - light.living_room_corner
+      - light.outside

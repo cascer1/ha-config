@@ -4,3 +4,6 @@ woken_up:
 night_time:
   name: Night Time (auto)
   icon: hass:weather-night
+house_occupied:
+  name: House is occupied
+  icon: fapro:house-return

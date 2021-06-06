@@ -4,6 +4,14 @@ thermostat_away:
   icon: mdi:thermostat
   mode: single
   sequence:
+  - service: climate.turn_off
+    target:
+      entity_id:
+      - climate.bedroom
+      - climate.living_room
+  - condition: state
+    entity_id: climate.tstat_8d728f
+    state: heat
   - service: climate.set_temperature
     entity_id: climate.tstat_8d728f
     data:
@@ -14,6 +22,10 @@ thermostat_home:
   icon: mdi:thermostat
   mode: single
   sequence:
+  - service: script.reload_climate_automations
+  - condition: state
+    entity_id: climate.tstat_8d728f
+    state: heat
   - service: climate.set_temperature
     entity_id: climate.tstat_8d728f
     data:
@@ -25,37 +37,26 @@ lights_not_home:
   mode: single
   sequence:
   - service: light.turn_off
-    data: {}
     entity_id: light.everywhere
-  - choose:
-    - conditions:
-      - condition: and
-        conditions:
-        - condition: numeric_state
-          entity_id: sun.sun
-          attribute: elevation
-          below: input_number.sun_elevation_dark
-        - condition: time
-          after: '12:00:00'
-      sequence:
-      - scene: scene.away
-    default: []
+  - condition: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    below: input_number.sun_elevation_dark
+  - condition: time
+    after: '12:00:00'
+  - scene: scene.away
 lights_home:
   alias: Lights home
   description: Turn on the lights when returning home
   icon: mdi:lamp
   mode: single
   sequence:
-  - scene: scene.home
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id: sun.sun
-        attribute: elevation
-        below: input_number.sun_elevation_dark
-      sequence:
-      - scene: scene.relax
-    default: []
+  - service: light.turn_on
+    target:
+      entity_id: light.downstairs
+  - service: switch.turn_on
+    target:
+      entity_id: switch.adaptive_lighting_downstairs
 home_music:
   alias: Home Music
   sequence:
@@ -95,41 +96,35 @@ wake_up:
   - service: script.morning_music
   - service: input_boolean.turn_on
     entity_id: input_boolean.woken_up
+  - service: switch.turn_on
+    target:
+      entity_id: switch.adaptive_lighting_bedroom
+  mode: single
 morning_music:
   alias: Morning Music
   icon: mdi:music
   sequence:
-  - service: media_player.volume_set
-    data:
-      volume_level: '{{ states(''input_number.home_music_volume_level'') }}'
-    entity_id: media_player.living_room_sonos
-  - service: media_player.select_source
-    entity_id: media_player.living_room_sonos
-    data:
-      source: '{{ states(''input_text.morning_music_source'') }}'
-  - service: media_player.repeat_set
-    data:
-      repeat: all
-    entity_id: media_player.living_room_sonos
   - service: media_player.shuffle_set
     data:
       shuffle: true
-    entity_id: media_player.living_room_sonos
-  mode: single
-bedroom_fade_on:
-  alias: Bedroom fade on
-  sequence:
-  - condition: state
-    entity_id: group.awesome_people
-    state: home
-  - service: light.turn_on
-    data:
-      transition: 300
-      color_temp: 272
     target:
-      entity_id: light.bedroom
+      entity_id: media_player.living_room_sonos
+  - service: media_player.repeat_set
+    target:
+      entity_id: media_player.living_room_sonos
+    data:
+      repeat: all
+  - service: media_player.volume_set
+    target:
+      entity_id: media_player.living_room_sonos
+    data:
+      volume_level: '{{ states(''input_number.home_music_volume_level'') }}'
+  - service: media_player.select_source
+    target:
+      entity_id: media_player.living_room_sonos
+    data:
+      source: '{{ states(''input_text.morning_music_source'') }}'
   mode: single
-  icon: mdi:bed
 doorbell:
   alias: Doorbell
   description: Ring the door bell
@@ -171,6 +166,18 @@ doorbell:
           minutes: 0
           seconds: 1
           milliseconds: 500
+  - service: media_player.repeat_set
+    target:
+      entity_id: media_player.living_room_sonos
+    data:
+      repeat: 'off'
+  - service: light.turn_on
+    target:
+      entity_id:
+      - light.side_kitchen_ceiling_1
+      - light.office_ceiling
+    data:
+      flash: short
   - delay:
       hours: 0
       minutes: 0
@@ -186,10 +193,53 @@ doorbell:
     data:
       message: Someone just rang the door bell
       title: Ding Dong 🔔
-  - service: notify.mobile_app_lm_v600
-    data:
-      message: Someone just rang the door bell
-      title: Ding Dong 🔔
   mode: single
   icon: mdi:bell
   max: 10
+reload_climate_automations:
+  alias: Execute climate schedules
+  sequence:
+  - service: scheduler.run_action
+    data:
+      entity_id: switch.schedule_living_room_heating_workdays
+  - service: scheduler.run_action
+    data:
+      entity_id: switch.schedule_living_room_cooling_workdays
+  - service: scheduler.run_action
+    data:
+      entity_id: switch.schedule_living_room_heating_weekends
+  - service: scheduler.run_action
+    data:
+      entity_id: switch.schedule_living_room_cooling_weekends
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_select.climate_mode
+        state: cool
+      sequence:
+      - service: climate.turn_off
+        target:
+          entity_id: climate.tstat_8d728f
+    default:
+    - service: climate.turn_on
+      target:
+        entity_id: climate.tstat_8d728f
+  mode: single
+  icon: fapro:sync
+thermostat_sleep:
+  alias: Thermostat to sleep
+  description: Turn off the thermostat for sleep
+  icon: mdi:thermostat
+  mode: single
+  sequence:
+  - service: climate.turn_off
+    target:
+      entity_id:
+      - climate.living_room
+  - condition: state
+    entity_id: climate.tstat_8d728f
+    state: heat
+  - service: climate.set_temperature
+    entity_id: climate.tstat_8d728f
+    data:
+      temperature: '{{ states(''input_number.away_temperature'') | float }}'

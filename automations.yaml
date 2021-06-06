@@ -1,6 +1,5 @@
 - id: watching_tv
   alias: Watching TV
-  description: ''
   trigger:
   - platform: state
     entity_id: media_player.plex_plex_for_android_tv_living_room_tv
@@ -18,36 +17,38 @@
     attribute: temperature
   condition:
   - condition: state
-    entity_id: group.awesome_people
-    state: not_home
+    entity_id: input_boolean.house_occupied
+    state: 'off'
   - condition: template
     value_template: '{{ (state_attr(''climate.tstat_8d728f'', ''temperature'')|float)
       > (states(''input_number.away_temperature'') | float) }}'
   action:
   - service: script.thermostat_away
+  mode: single
 - id: leaving_home
   alias: Leaving home
   description: Turn down the thermostat and turn off the lights when everyone leaves
     and stays away for 5 minutes.
   trigger:
   - platform: state
-    entity_id: group.awesome_people
-    from: home
-    to: not_home
+    entity_id: input_boolean.house_occupied
+    from: 'on'
     for: 00:05:00
+    to: 'off'
   action:
   - service: script.lights_not_home
   - service: script.thermostat_away
   - service: media_player.media_stop
     entity_id: media_player.living_room_sonos
+  mode: single
 - id: returning_home
   alias: Returning home
   description: Turn up the thermostat and turn on the lights when someone comes home
   trigger:
   - platform: state
-    entity_id: group.awesome_people
-    from: not_home
-    to: home
+    entity_id: input_boolean.house_occupied
+    from: 'off'
+    to: 'on'
   action:
   - service: script.lights_home
   - condition: time
@@ -58,7 +59,6 @@
   mode: single
 - id: sun_setting
   alias: Sun setting
-  description: ''
   trigger:
   - platform: sun
     event: sunset
@@ -68,7 +68,8 @@
     entity_id: light.everywhere
     state: 'off'
   action:
-  - service: script.lights_{{states('group.awesome_people')}}
+  - service: script.lights_{% if states('input_boolean.house_occupied') -%}home{%-
+      else -%}not_home{%- endif %}
   mode: single
 - id: lights_off_away
   alias: lights off when away
@@ -82,8 +83,8 @@
     above: input_number.sun_elevation_dark
   condition:
   - condition: state
-    entity_id: group.awesome_people
-    state: not_home
+    entity_id: input_boolean.house_occupied
+    state: 'off'
   action:
   - service: light.turn_off
     entity_id: light.everywhere
@@ -115,7 +116,7 @@
   initial_state: 'true'
   mode: single
 - id: sonos_off_at_night
-  alias: Sonos off at night
+  alias: downstairs off at night
   trigger:
   - platform: state
     entity_id: light.downstairs
@@ -133,13 +134,17 @@
   action:
   - service: media_player.media_pause
     entity_id: media_player.living_room_sonos
+  - service: climate.turn_off
+    target:
+      entity_id: climate.living_room
   mode: single
 - id: going_to_bed
   alias: Going to bed
-  description: Turn off the thermostat and sonos after all the lights are turned off at night
+  description: Turn off the thermostat and sonos after all the lights are turned off
+    at night
   trigger:
   - platform: state
-    entity_id: light.everywhere
+    entity_id: light.inside
     from: 'on'
     to: 'off'
     for: 00:05:00
@@ -149,12 +154,23 @@
   - condition: time
     after: input_datetime.night_time
   - condition: state
-    entity_id: light.everywhere
+    entity_id: light.inside
+    state: 'off'
+  - condition: state
+    entity_id: group.awesome_people
+    state: home
+  - condition: state
+    entity_id: input_boolean.night_time
     state: 'off'
   action:
-  - service: script.thermostat_away
+  - service: script.thermostat_sleep
   - service: media_player.media_pause
     entity_id: media_player.living_room_sonos
+  - service: light.turn_off
+    target:
+      entity_id:
+      - light.inside
+      - light.outside
   mode: single
 - id: good_morning
   alias: Good Morning
@@ -186,7 +202,13 @@
     entity_id: input_boolean.woken_up
   - service: light.turn_off
     data: {}
-    entity_id: light.downstairs
+    target:
+      entity_id:
+      - light.downstairs
+      - light.outside
+  - service: switch.turn_off
+    target:
+      entity_id: switch.adaptive_lighting_bedroom
   mode: single
 - id: night_time_toggle
   alias: Turn off night mode
@@ -274,4 +296,36 @@
     - switch.adaptive_lighting_sleep_mode_downstairs
   variables:
     sleep_mode: '{{ states(''input_boolean.night_time'') }}'
+  mode: single
+- id: toggle_home_occupied
+  alias: Toggle home occupied
+  description: Set the home occupied boolean
+  trigger:
+  - platform: state
+    entity_id: group.awesome_people
+  - platform: homeassistant
+    event: start
+  action:
+  - service: input_boolean.turn_{% if is_state('group.awesome_people', 'home') -%}on{%-
+      else -%}off{%- endif %}
+    entity_id: input_boolean.house_occupied
+- id: toggle_climate_mode
+  alias: Toggle climate mode
+  trigger:
+  - platform: state
+    entity_id: input_select.climate_mode
+  action:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_select.climate_mode
+        state: 'off'
+      sequence:
+      - service: climate.turn_off
+        target:
+          entity_id:
+          - climate.living_room
+          - climate.bedroom
+    default:
+    - service: script.reload_climate_automations
   mode: single
