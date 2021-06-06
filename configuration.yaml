@@ -23,9 +23,9 @@ tts:
 sonos:
   media_player:
     hosts:
-      - 10.10.10.90
-    interface_addr: 10.10.20.18
-    advertise_addr: 10.10.20.18
+      - !secret network_sonos_host
+    interface_addr: !secret network_hass_host
+    advertise_addr: !secret network_hass_host
 
 recorder:
   commit_interval: 10
