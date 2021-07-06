@@ -208,7 +208,7 @@ action:
       value_template: '{{ trigger.event.data.command == "press" }}'
     - condition: template
       value_template: '{{ trigger.event.data.args == [257,13,0] }}'
-    sequence: !input 
+    sequence:
       - service: script.zha_store_click
         data_template:
           device: '{{ trigger.event.data.device_ieee }}'
@@ -221,7 +221,7 @@ action:
               {% set click_count = states("input_text.zha_click").split(",")[3]|int %}
               {{ click_count >= 2}}
           sequence: !input 'colordown_short_double'
-        default: 'colordown_short'
+        default: !input 'colordown_short'
   - conditions:
     - condition: template
       value_template: '{{ trigger.event.data.command == "hold" }}'
