@@ -22,6 +22,7 @@ secrets.yaml
 ip_bans.yaml
 media
 google_service_account.json
+custom_icons
 
 # Blueprints
 blueprints/automation/*
