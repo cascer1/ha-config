@@ -5,3 +5,8 @@ awesome_people:
   entities:
     - person.bert
     - person.cas_eliens
+living_room_motion:
+  name: Living Room Motion
+  entities:
+    - binary_sensor.motion_a_activity
+    - binary_sensor.motion_b_activity

@@ -14,3 +14,7 @@ morning_time:
   name: Morning time threshold
   has_date: false
   has_time: true
+alarm_time:
+  name: Wake up alarm time
+  has_date: true
+  has_time: true

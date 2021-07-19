@@ -1,0 +1,51 @@
+  project_id: home-assistant-e186a
+  service_account: !include google_service_account.json
+  report_state: true
+  exposed_domains:
+    - light
+    - switch
+    - climate
+  expose_by_default: false
+  entity_config:
+    light.office_ceiling:
+      name: Office Light
+      aliases:
+        - Office Lights
+        - Office
+    light.bedroom_lights_zha_group_0x0003:
+      name: Bedroom Lights
+      aliases:
+        - Bedroom Light
+        - Bedroom
+    light.downstairs_lights_zha_group_0x0004:
+      name: Downstairs Lights
+      aliases:
+        - Downstairs Light
+        - Downstairs
+    light.kitchen_lights_zha_group_0x0005:
+      name: Kitchen Lights
+      aliases:
+        - Kitchen Light
+        - Kitchen
+    light.dining_table_zha_group_0x0007:
+      name: Dining Table Lights
+      aliases:
+        - Table Lights
+        - Table Light
+        - Dining Lamp
+        - Dining Light
+    light.side_kitchen_lights_zha_group_0x0002:
+      name: Side Kitchen Lights
+      aliases:
+        - Shed Lights
+    light.tv_zha_group_0x0009:
+      name: TV Lights
+      aliases:
+        - Entertainment Lights
+        - Television Lights
+        - Front Lights
+        - Sitting Lights
+    climate.living_room:
+      name: Living Room AC
+    climate.bedroom:
+      name: Bedroom AC

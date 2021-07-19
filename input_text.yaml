@@ -7,3 +7,6 @@ home_music_source_cas:
 morning_music_source:
   name: "Morning Music Source"
   icon: mdi:music
+zha_click:
+  name: "ZHA click tracking"
+  icon: mdi:table-clock

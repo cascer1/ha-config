@@ -1,0 +1,126 @@
+blueprint:
+  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/zha_philips_dimmer_custom.yaml
+  name: "ZHA - Philips Hue Dimmer Switch - Custom Actions"
+  description: Freely customizable actions for Philips Hue Dimmer Switch buttons.
+  domain: automation
+  input:
+    remote:
+      name: Dimmer Switch
+      selector:
+        device:
+          integration: zha
+          manufacturer: Philips
+          entity:
+            domain: sensor
+            device_class: battery
+    on_press:
+      name: Button 1 (ON) press actions
+      default: []
+      selector:
+        action: {}
+    on_hold:
+      name: Button 1 (ON) hold actions
+      default: []
+      selector:
+        action: {}
+    on_double:
+      name: Button 1 (ON) double click actions
+      default: []
+      selector:
+        action: {}
+    up_press:
+      name: Button 2 (UP) press actions
+      default: []
+      selector:
+        action: {}
+    up_hold:
+      name: Button 2 (UP) hold actions
+      default: []
+      selector:
+        action: {}
+    up_double:
+      name: Button 2 (UP) double click actions
+      default: []
+      selector:
+        action: {}
+    down_press:
+      name: Button 3 (DOWN) press actions
+      default: []
+      selector:
+        action: {}
+    down_hold:
+      name: Button 3 (DOWN) hold actions
+      default: []
+      selector:
+        action: {}
+    down_double:
+      name: Button 3 (DOWN) double click actions
+      default: []
+      selector:
+        action: {}
+    off_press:
+      name: Button 4 (OFF) press actions
+      default: []
+      selector:
+        action: {}
+    off_hold:
+      name: Button 4 (OFF) hold actions
+      default: []
+      selector:
+        action: {}
+    off_double:
+      name: Button 4 (OFF) double click actions
+      default: []
+      selector:
+        action: {}
+
+mode: parallel
+max_exceeded: silent
+
+trigger:
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input remote
+
+action:
+  - variables:
+      command: '{{ trigger.event.data.command }}'
+  - choose:
+      - conditions:
+          - '{{ command == "on_short_release" }}'
+        sequence: !input on_press
+      - conditions:
+          - '{{ command == "on_hold" }}'
+        sequence: !input on_hold
+      - conditions:
+          - '{{ command == "on_double_press" }}'
+        sequence: !input on_double
+      - conditions:
+          - '{{ command == "up_short_release" }}'
+        sequence: !input up_press
+      - conditions:
+          - '{{ command == "up_hold" }}'
+        sequence: !input up_hold
+      - conditions:
+          - '{{ command == "up_double_press" }}'
+        sequence: !input up_double
+      - conditions:
+          - '{{ command == "down_short_release" }}'
+        sequence: !input down_press
+      - conditions:
+          - '{{ command == "down_hold" }}'
+        sequence: !input down_hold
+      - conditions:
+          - '{{ command == "down_double_press" }}'
+        sequence: !input down_double
+      - conditions:
+          - '{{ command == "off_short_release" }}'
+        sequence: !input off_press
+      - conditions:
+          - '{{ command == "off_hold" }}'
+        sequence: !input off_hold
+      - conditions:
+          - '{{ command == "off_double_press" }}'
+        sequence: !input off_double
+

@@ -14,30 +14,6 @@ home_temperature:
   unit_of_measurement: °C
   mode: box
   icon: mdi:temperature-celsius
-power_peak_tariff:
-  name: Peak power tariff
-  min: 0.0
-  max: 100.0
-  step: 0.001
-  unit_of_measurement: c/kWh
-  mode: box
-  icon: mdi:currency-eur
-power_offpeak_tariff:
-  name: Offpeak power tariff
-  min: 0.0
-  max: 100.0
-  step: 0.001
-  unit_of_measurement: c/kWh
-  mode: box
-  icon: mdi:currency-eur
-gas_tariff:
-  name: Gas tariff
-  min: 0.0
-  max: 100.0
-  step: 0.001
-  unit_of_measurement: c/m3
-  mode: box
-  icon: mdi:currency-eur
 sun_elevation_dark:
   name: Darkness sun elevation
   min: -90

@@ -21,3 +21,10 @@ secrets.yaml
 *.token
 ip_bans.yaml
 media
+google_service_account.json
+
+# Blueprints
+blueprints/automation/*
+blueprints/script/*
+!blueprints/automation/cascer1/
+!blueprints/script/cascer1/

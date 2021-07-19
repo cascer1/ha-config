@@ -9,12 +9,17 @@ homeassistant:
 
 http:
   # https://www.home-assistant.io/integrations/http/#ip_ban_enabled
-  ip_ban_enabled: True
+  ip_ban_enabled: true
   login_attempts_threshold: 5
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - !secret trusted_proxy_host
 
 ## Configure a default setup of Home Assistant Core (frontend, api, etc)
 # Learn more at https://www.home-assistant.io/integrations/default_config
 default_config:
+
+google_assistant: !include google_assistant.yaml
 
 # Text to speech
 tts:
@@ -24,7 +29,6 @@ sonos:
   media_player:
     hosts:
       - !secret network_sonos_host
-    interface_addr: !secret network_hass_host
     advertise_addr: !secret network_hass_host
 
 recorder:
@@ -48,11 +52,13 @@ history:
       - media_player
     entities:
       - binary_sensor.updater
-      - sensor.blood_sugar
     entity_globs:
       - script.*
       - input_*
+      - switch.schedule_*
+      - switch.adaptive_lighting*
       - automation
+      - adguard
 
 spotify:
   client_id: !secret spotify_client_id

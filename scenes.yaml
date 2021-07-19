@@ -1,28 +1,3 @@
-- id: away
-  name: away
-  entities:
-    switch.adaptive_lighting_downstairs:
-      state: 'off'
-    light.kitchen_cabinets:
-      brightness: 38
-      state: 'on'
-    light.living_room_corner:
-      brightness: 105
-      color_temp: 377
-      state: 'on'
-    light.upstairs:
-      state: 'off'
-    light.kitchen_ceiling:
-      state: 'off'
-    light.dining_table_down:
-      state: 'off'
-    light.dining_table_up:
-      state: 'off'
-    light.living_room_ceiling:
-      state: 'off'
-    light.garden:
-      state: 'off'
-  icon: mdi:home-remove-outline
 - id: home
   name: home
   entities:
@@ -136,3 +111,261 @@
       icon: mdi:theme-light-dark
       state: 'off'
   icon: mdi:silverware-fork-knife
+- id: '1625662468220'
+  name: Morning Lights
+  entities:
+    light.bedroom_ceiling_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
+      brightness: 254
+      color_temp: 242
+      off_brightness:
+      friendly_name: bedroom ceiling 1
+      supported_features: 63
+      state: 'on'
+    light.bedroom_ceiling_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
+      brightness: 254
+      color_temp: 242
+      off_brightness:
+      friendly_name: bedroom ceiling 2
+      supported_features: 63
+      state: 'on'
+- id: '1625814785765'
+  name: living room dark
+  entities:
+    light.living_room_corner:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
+      brightness: 36
+      color_temp: 258
+      off_brightness:
+      friendly_name: living room corner
+      supported_features: 63
+      state: 'on'
+    light.kitchen_ceiling:
+      min_mireds: 153
+      max_mireds: 454
+      supported_color_modes:
+      - color_temp
+      color_mode: color_temp
+      brightness: 38
+      color_temp: 258
+      off_brightness:
+      friendly_name: kitchen ceiling
+      supported_features: 43
+      state: 'on'
+    light.living_room_ceiling:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
+      off_brightness:
+      friendly_name: living room ceiling
+      supported_features: 63
+      state: 'off'
+    light.dining_table_up:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
+      brightness: 51
+      color_temp: 258
+      off_brightness:
+      friendly_name: dining table up
+      supported_features: 63
+      state: 'on'
+    light.dining_table_down:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
+      off_brightness:
+      friendly_name: dining table down
+      supported_features: 63
+      state: 'off'
+    light.kitchen_cabinets:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 59
+      off_brightness:
+      friendly_name: kitchen cabinets
+      supported_features: 41
+      state: 'on'
+- id: dnd_travel_day
+  name: dnd_travel_day
+  entities:
+    light.dining_table_up:
+      color_mode: hs
+      brightness: 254
+      hs_color:
+      - 181.579
+      - 14.902
+      state: 'on'
+    light.dining_table_down:
+      color_mode: color_temp
+      brightness: 189
+      color_temp: 318
+      state: 'on'
+    light.kitchen_ceiling:
+      color_mode: color_temp
+      brightness: 254
+      color_temp: 193
+      state: 'on'
+    light.kitchen_cabinets:
+      color_mode: brightness
+      brightness: 254
+      state: 'on'
+    light.living_room_ceiling:
+      color_mode: hs
+      brightness: 254
+      hs_color:
+      - 195.413
+      - 42.745
+      state: 'on'
+    light.living_room_corner:
+      color_mode: hs
+      brightness: 254
+      hs_color:
+      - 181.579
+      - 14.902
+      state: 'on'
+    switch.adaptive_lighting_downstairs:
+      state: 'off'
+- id: dnd_travel_night
+  name: dnd_travel_night
+  entities:
+    light.dining_table_up:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
+      brightness: 74
+      hs_color:
+      - 240.335
+      - 70.196
+      rgb_color:
+      - 76
+      - 76
+      - 255
+      xy_color:
+      - 0.166
+      - 0.088
+      off_brightness:
+      friendly_name: dining table up
+      supported_features: 63
+      state: 'on'
+    light.dining_table_down:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: color_temp
+      brightness: 133
+      color_temp: 392
+      off_brightness:
+      friendly_name: dining table down
+      supported_features: 63
+      state: 'on'
+    light.kitchen_ceiling:
+      min_mireds: 153
+      max_mireds: 454
+      supported_color_modes:
+      - color_temp
+      off_brightness:
+      friendly_name: kitchen ceiling
+      supported_features: 43
+      state: 'off'
+    light.kitchen_cabinets:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 38
+      off_brightness:
+      friendly_name: kitchen cabinets
+      supported_features: 41
+      state: 'on'
+    light.living_room_ceiling:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
+      off_brightness:
+      friendly_name: living room ceiling
+      supported_features: 63
+      state: 'off'
+    light.living_room_corner:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
+      brightness: 56
+      hs_color:
+      - 240
+      - 100
+      rgb_color:
+      - 0
+      - 0
+      - 255
+      xy_color:
+      - 0.136
+      - 0.04
+      off_brightness:
+      friendly_name: living room corner
+      supported_features: 63
+      state: 'on'
+    switch.adaptive_lighting_downstairs:
+      brightness_pct:
+      color_temp_kelvin:
+      color_temp_mired:
+      rgb_color:
+      xy_color:
+      hs_color:
+      sun_position:
+      friendly_name: 'Adaptive Lighting: Downstairs'
+      icon: mdi:theme-light-dark
+      state: 'off'

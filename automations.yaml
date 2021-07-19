@@ -38,8 +38,9 @@
   action:
   - service: script.lights_not_home
   - service: script.thermostat_away
-  - service: media_player.media_stop
-    entity_id: media_player.living_room_sonos
+  - service: media_player.media_pause
+    target:
+      entity_id: media_player.living_room_sonos
   mode: single
 - id: returning_home
   alias: Returning home
@@ -50,7 +51,15 @@
     from: 'off'
     to: 'on'
   action:
-  - service: script.lights_home
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sun.sun
+        attribute: elevation
+        below: input_number.sun_elevation_dark
+      sequence:
+      - service: script.lights_home
+    default: []
   - condition: time
     after: input_datetime.morning_time
     before: input_datetime.night_time
@@ -68,8 +77,8 @@
     entity_id: light.everywhere
     state: 'off'
   action:
-  - service: script.lights_{% if states('input_boolean.house_occupied') -%}home{%-
-      else -%}not_home{%- endif %}
+  - service: script.lights{% if is_state('input_boolean.house_occupied', 'off') %}_not{%
+      endif %}_home
   mode: single
 - id: lights_off_away
   alias: lights off when away
@@ -98,8 +107,9 @@
   - service: notify.utilitydaily
     data_template:
       message: ',{{states.sensor.energy_daily_low_meter.state}},{{states.sensor.energy_daily_high_meter.state}},{{states.sensor.energy_production_daily_low_meter.state}},{{states.sensor.energy_production_daily_high_meter.state}},{{(states.sensor.solaredge_energy_today.state
-        | float)/1000}},{{states.sensor.gas_daily_meter.state}}'
+        | float)/1000}},{{states.sensor.gas_daily_meter.state}},{{states.sensor.energy_consumption_tarif_1.state}},{{states.sensor.energy_consumption_tarif_2.state}},{{states.sensor.energy_production_tarif_1.state}},{{states.sensor.energy_production_tarif_2.state}},{{states.sensor.gas_consumption.state}}'
   initial_state: 'true'
+  mode: single
 - id: store_monthly_utility_usage
   alias: Store monthly utility usage
   trigger:
@@ -112,7 +122,7 @@
   - service: notify.utilitymonthly
     data_template:
       message: ',{{states.sensor.energy_monthly_low_meter.state}},{{states.sensor.energy_monthly_high_meter.state}},{{states.sensor.energy_production_monthly_low_meter.state}},{{states.sensor.energy_production_monthly_high_meter.state}},{{(states.sensor.solar_monthly_meter.state
-        | float)/1000}},{{states.sensor.gas_monthly_meter.state}}'
+        | float)/1000}},{{states.sensor.gas_monthly_meter.state}},{{states.sensor.energy_consumption_tarif_1.state}},{{states.sensor.energy_consumption_tarif_2.state}},{{states.sensor.energy_production_tarif_1.state}},{{states.sensor.energy_production_tarif_2.state}},{{states.sensor.gas_consumption.state}}'
   initial_state: 'true'
   mode: single
 - id: sonos_off_at_night
@@ -128,6 +138,7 @@
   condition:
   - condition: time
     after: input_datetime.evening_time
+    before: 05:00:00
   - condition: state
     entity_id: light.downstairs
     state: 'off'
@@ -232,33 +243,8 @@
     domain: binary_sensor
   action:
   - service: script.doorbell
-    data:
-      count: 1
+    data: {}
   - delay: 1
-  mode: single
-- id: door_bell_pressed_long
-  alias: Door bell pressed long
-  description: Door bell pressed for 20 seconds
-  trigger:
-  - type: powered
-    platform: device
-    device_id: 5bfd9f27f34c77a83fd342bf8f93e7cc
-    entity_id: binary_sensor.shelly1_e8db84d3500b_input
-    domain: binary_sensor
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 20
-      milliseconds: 0
-  action:
-  - service: light.turn_on
-    target:
-      entity_id: light.everywhere
-    data:
-      flash: long
-  - service: script.doorbell
-    data:
-      count: 5
   mode: single
 - id: night_mode_on
   alias: turn on night mode
@@ -268,11 +254,13 @@
     entity_id: light.everywhere
     to: 'off'
     for: 00:05:00
+    from: 'on'
   - platform: time
     at: input_datetime.deep_night_time
   condition:
   - condition: time
     after: input_datetime.night_time
+    before: input_datetime.morning_time
   - condition: state
     entity_id: light.everywhere
     state: 'off'
@@ -329,3 +317,226 @@
     default:
     - service: script.reload_climate_automations
   mode: single
+- id: '1623011723106'
+  alias: Turn outside lights off when downstairs lights are turned off
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: light.downstairs
+    from: 'on'
+    to: 'off'
+  condition:
+  - condition: time
+    after: input_datetime.evening_time
+    before: input_datetime.morning_time
+  action:
+  - service: light.turn_off
+    target:
+      entity_id: light.outside
+  mode: single
+- id: '1625643897153'
+  alias: Light switch bedroom bed
+  description: ''
+  use_blueprint:
+    path: cascer1/zha_philips_dimmer_adaptive_lights.yaml
+    input:
+      remote: 0bb5a8e1cd2eaeae57aecfde809ff4a0
+      brightness_step: 10
+      adaptive_switch: switch.adaptive_lighting_bedroom
+      lights:
+        entity_id: light.bedroom_lights_zha_group_0x0003
+- id: '1625646540727'
+  alias: Light switch office
+  description: ''
+  use_blueprint:
+    path: cascer1/zha_philips_dimmer_adaptive_lights.yaml
+    input:
+      remote: 0c4da719bcb63f5906a981887107b46c
+      lights:
+        entity_id: light.office_ceiling
+      brightness_step: 10
+      adaptive_switch: switch.adaptive_lighting_office
+- id: '1625655627109'
+  alias: light switch side kitchen
+  description: ''
+  use_blueprint:
+    path: cascer1/zha_philips_dimmer_adaptive_lights.yaml
+    input:
+      remote: 725f1bc736179cea1cbacc1246b50efc
+      lights:
+        entity_id:
+        - light.side_kitchen_lights_zha_group_0x0002
+      brightness_step: 10
+      adaptive_switch: switch.adaptive_lighting_side_kitchen
+- id: '1625655673754'
+  alias: light switch kitchen
+  description: ''
+  use_blueprint:
+    path: cascer1/zha_philips_dimmer_adaptive_lights.yaml
+    input:
+      remote: 2498812930e32477ec650a77852af040
+      brightness_step: 10
+      adaptive_switch: switch.adaptive_lighting_downstairs
+      lights:
+        entity_id: light.kitchen_lights_zha_group_0x0005
+- id: '1625655734660'
+  alias: light switch living room
+  description: ''
+  use_blueprint:
+    path: cascer1/zha_philips_dimmer_adaptive_lights.yaml
+    input:
+      remote: 61dafb48861c8abf564ec83f1ce11449
+      brightness_step: 10
+      adaptive_switch: switch.adaptive_lighting_downstairs
+      lights:
+        entity_id: light.downstairs_lights_zha_group_0x0004
+- id: '1625656128887'
+  alias: light switch bedroom wall
+  description: ''
+  use_blueprint:
+    path: cascer1/zha_philips_dimmer_adaptive_lights.yaml
+    input:
+      remote: 72a685de44cfc5e1847aeed00d4da9c8
+      brightness_step: 10
+      adaptive_switch: switch.adaptive_lighting_bedroom
+      lights:
+        entity_id: light.bedroom_lights_zha_group_0x0003
+- id: '1625663312335'
+  alias: Wake up lights bedroom
+  description: ''
+  trigger:
+  - platform: time
+    at: input_datetime.alarm_time
+  condition:
+  - condition: state
+    entity_id: group.awesome_people
+    state: home
+  action:
+  - service: scene.turn_on
+    target:
+      entity_id: scene.morning_lights
+    data:
+      transition: 300
+  mode: single
+- id: '1626004480351'
+  alias: Tradfri remote
+  description: ''
+  use_blueprint:
+    path: cascer1/zha_ikea_tradfri_5button_remote_double.yaml
+    input:
+      remote: 1644a0a0c1b7e73775bf31d020d05a45
+      dimup_long: []
+      dimdown_long: []
+      dimdown_short:
+      - service: light.toggle
+        target:
+          entity_id: light.downstairs_lights_zha_group_0x0004
+      dimdown_short_double:
+      - service: script.flash_light
+        data:
+          flash_mode: short
+          light_entity:
+            entity_id: light.downstairs_lights_zha_group_0x0004
+          adaptive_light_entity:
+            entity_id: switch.adaptive_lighting_downstairs
+      dimup_short_double:
+      - service: script.flash_light
+        data:
+          flash_mode: short
+          light_entity:
+            entity_id: light.office_ceiling
+          adaptive_light_entity:
+            entity_id: switch.adaptive_lighting_office
+      power_short:
+      - service: media_player.media_play_pause
+        target:
+          entity_id: media_player.living_room_sonos
+- id: '1626167291086'
+  alias: Next alarm time changed
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.bert_phone_next_alarm
+  - platform: state
+    entity_id: sensor.cas_phone_next_alarm
+  - platform: state
+    entity_id: person.cas_eliens
+    from: home
+  - platform: state
+    entity_id: person.bert
+    from: home
+  - platform: state
+    entity_id: person.cas_eliens
+    to: home
+  - platform: state
+    entity_id: person.bert
+    to: home
+  condition: []
+  action:
+  - service: script.determine_alarm_light_fade_time
+  mode: single
+- id: '1626347682611'
+  alias: Motion living room
+  description: ''
+  use_blueprint:
+    path: cascer1/motion_light_illuminance.yaml
+    input:
+      light_target:
+        entity_id: light.downstairs
+      motion_entity: group.living_room_motion
+      light_sensor: sensor.living_room_illuminance
+      light_level: 200
+      no_motion_wait: 900
+- id: '1626362518806'
+  alias: motion while away
+  description: ''
+  trigger:
+  - platform: state
+    from: 'off'
+    to: 'on'
+    entity_id: binary_sensor.motion_a_activity
+  - platform: state
+    entity_id: binary_sensor.motion_b_activity
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.motion_c_activity
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.motion_c_activity
+    from: 'off'
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: group.awesome_people
+    state: not_home
+  action:
+  - service: notify.mobile_app_cas_phone
+    data:
+      message: motion detected while nobody was home
+  mode: single
+- id: '1626441573303'
+  alias: Motion side kitchen
+  description: ''
+  use_blueprint:
+    path: cascer1/motion_light_illuminance.yaml
+    input:
+      motion_entity: binary_sensor.motion_d_activity
+      light_sensor: sensor.motion_d_illuminance
+      light_target:
+        entity_id: light.side_kitchen_lights_zha_group_0x0002
+      light_level: 400
+      no_motion_wait: 60
+- id: '1626441632954'
+  alias: motion office
+  description: ''
+  use_blueprint:
+    path: cascer1/motion_light_illuminance.yaml
+    input:
+      motion_entity: binary_sensor.motion_c_activity
+      light_sensor: sensor.motion_c_illuminance
+      light_target:
+        entity_id: light.office_ceiling
+      light_level: 120
+      no_motion_wait: 900

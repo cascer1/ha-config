@@ -1,6 +1,3 @@
-- platform: dsmr
-  port: /dev/cuaU0
-  dsmr_version: 5
 - platform: template
   sensors:
     energy_consumption_total_custom:
@@ -57,9 +54,8 @@
   precision: 0
   max_age:
     minutes: 2
-- platform: statistics
-  name: average_gas
-  entity_id: sensor.hourly_gas_consumption
-  precision: 3
-  max_age:
-    minutes: 45
+- platform: average
+  name: living_room_illuminance
+  entities:
+    - sensor.motion_a_illuminance
+    - sensor.motion_b_illuminance

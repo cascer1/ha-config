@@ -44,7 +44,14 @@ lights_not_home:
     below: input_number.sun_elevation_dark
   - condition: time
     after: '12:00:00'
-  - scene: scene.away
+  - service: light.turn_off
+    target:
+      entity_id: light.everywhere
+  - service: light.turn_on
+    target:
+      entity_id:
+      - light.kitchen_cabinets
+      - light.living_room_corner
 lights_home:
   alias: Lights home
   description: Turn on the lights when returning home
@@ -53,7 +60,9 @@ lights_home:
   sequence:
   - service: light.turn_on
     target:
-      entity_id: light.downstairs
+      entity_id:
+      - light.downstairs
+      - light.garden
   - service: switch.turn_on
     target:
       entity_id: switch.adaptive_lighting_downstairs
@@ -141,43 +150,44 @@ doorbell:
       entity_id: media_player.living_room_sonos
     data:
       volume_level: 0.25
-  - repeat:
-      count: '{{ count }}'
-      sequence:
-      - service: switch.turn_on
-        target:
-          entity_id: switch.shelly1_e8db84d3500b
-      - service: media_player.play_media
-        data:
-          media_content_id: https://assistant.eliens.co/local/doorbell1.wav
-          media_content_type: music
-        target:
-          entity_id:
-          - media_player.living_room_sonos
-      - service: media_player.play_media
-        data:
-          media_content_id: media-source://media_source/local/doorbell1.wav
-          media_content_type: audio/x-wav
-        target:
-          entity_id:
-          - media_player.office_speaker
-      - delay:
-          hours: 0
-          minutes: 0
-          seconds: 1
-          milliseconds: 500
+  - service: switch.turn_on
+    target:
+      entity_id: switch.shelly1_e8db84d3500b
+  - service: media_player.play_media
+    data:
+      media_content_id: https://assistant.eliens.co/local/doorbell1.wav
+      media_content_type: music
+    target:
+      entity_id:
+      - media_player.living_room_sonos
+  - service: media_player.play_media
+    data:
+      media_content_id: media-source://media_source/local/doorbell1.wav
+      media_content_type: audio/x-wav
+    target:
+      entity_id:
+      - media_player.office_speaker
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 500
   - service: media_player.repeat_set
     target:
       entity_id: media_player.living_room_sonos
     data:
       repeat: 'off'
-  - service: light.turn_on
-    target:
-      entity_id:
-      - light.side_kitchen_ceiling_1
-      - light.office_ceiling
+  - service: script.flash_light
     data:
-      flash: short
+      flash_mode: short
+      light_entity:
+        entity_id:
+        - light.office_ceiling
+        - light.side_kitchen_ceiling_1
+      adaptive_light_entity:
+        entity_id:
+        - switch.adaptive_lighting_office
+        - switch.adaptive_lighting_side_kitchen
   - delay:
       hours: 0
       minutes: 0
@@ -220,10 +230,7 @@ reload_climate_automations:
       - service: climate.turn_off
         target:
           entity_id: climate.tstat_8d728f
-    default:
-    - service: climate.turn_on
-      target:
-        entity_id: climate.tstat_8d728f
+    default: []
   mode: single
   icon: fapro:sync
 thermostat_sleep:
@@ -243,3 +250,131 @@ thermostat_sleep:
     entity_id: climate.tstat_8d728f
     data:
       temperature: '{{ states(''input_number.away_temperature'') | float }}'
+flash_light:
+  alias: Flash Light
+  mode: queued
+  icon: mdi:flash_alert_outline
+  fields:
+    flash_mode:
+      name: Flash Mode
+      description: Flash mode to use
+      required: true
+      selector:
+        select:
+          options:
+          - short
+          - long
+    light_entity:
+      name: Lights to flash
+      required: true
+      selector:
+        target:
+          entity:
+            domain: light
+    adaptive_light_entity:
+      name: Adaptive light switches to manage
+      required: true
+      selector:
+        target:
+          entity:
+            domain: switch
+  sequence:
+  - service: scene.create
+    data:
+      scene_id: light_flash_state
+      snapshot_entities: '{{ light_entity.entity_id }}'
+  - service: scene.create
+    data:
+      scene_id: light_flash_adaptive_state
+      snapshot_entities: '{{ adaptive_light_entity.entity_id }}'
+  - service: switch.turn_off
+    target: '{{ adaptive_light_entity }}'
+  - service: light.turn_on
+    target: '{{ light_entity }}'
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - service: light.turn_on
+    target: '{{ light_entity }}'
+    data:
+      flash: '{{ flash_mode }}'
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ flash_mode == "short" }}'
+      sequence:
+      - delay: 1
+    - conditions:
+      - condition: template
+        value_template: '{{ flash_mode == "long" }}'
+      sequence:
+      - delay: 16
+    default: []
+  - service: scene.turn_on
+    target:
+      entity_id:
+      - scene.light_flash_state
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 750
+  - service: scene.turn_on
+    target:
+      entity_id:
+      - scene.light_flash_adaptive_state
+  max: 10
+zha_store_click:
+  alias: Store ZHA click
+  description: Store the most recent ZHA event
+  mode: queued
+  sequence:
+  - service: input_text.set_value
+    data_template:
+      entity_id: input_text.zha_click
+      value: "{%- set data = states(\"input_text.zha_click\").split(\",\") %} {%-\
+        \ set previous_device = data[0]|trim %} {%- set previous_command = data[1]|trim\
+        \ %} {%- set click = as_timestamp(now())|float %} {%- set previous_click =\
+        \ data[2]|float %} {%- set click_delta = click - previous_click %} {%- set\
+        \ click_count = data[3]|int %} {{- device|trim }}, {{- command|trim }}, {{-\
+        \ click }}, {%- if click_delta <= 0.5 and previous_device == device|trim and\
+        \ previous_command == command %}\n  {{- click_count + 1 }}\n{%- else %}\n\
+        \  {{- 1 }}\n{%- endif %}"
+determine_alarm_light_fade_time:
+  alias: Determine alarm light fade time
+  description: Figure out the time when the bedroom lights should start fading to
+    on
+  mode: single
+  variables:
+    bertTime: '{{ states(''sensor.bert_phone_next_alarm'') | as_timestamp | int }}'
+    casTime: '{{ states(''sensor.cas_phone_next_alarm'') | as_timestamp | int }}'
+    bertHome: '{{ states(''person.bert'') == ''home'' }}'
+    casHome: '{{ states(''person.cas_eliens'') == ''home'' }}'
+  sequence:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ casHome and casTime < bertTime and casTime > 0}}'
+      sequence:
+      - service: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.alarm_time
+        data:
+          timestamp: '{{ casTime - 180 }}'
+    - conditions:
+      - condition: template
+        value_template: '{{ bertHome and bertTime > 0 }}'
+      sequence:
+      - service: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.alarm_time
+        data:
+          timestamp: '{{ bertTime - 180 }}'
+    default:
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.alarm_time
+      data:
+        timestamp: '9999999000'
