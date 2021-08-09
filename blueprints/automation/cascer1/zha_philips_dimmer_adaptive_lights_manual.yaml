@@ -1,0 +1,156 @@
+blueprint:
+  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/zha_philips_dimmer_adaptive_lights_manual.yaml
+  name: "ZHA - Philips Hue Dimmer Switch - Adaptive Lights - Manual control"
+  description: Use a Philips Hue Dimmer Switch to control a light(group) and associated adaptive lights, and turn off motion sensors when used
+  domain: automation
+  input:
+    remote:
+      name: Dimmer Switch
+      selector:
+        device:
+          integration: zha
+          manufacturer: Philips
+          entity:
+            domain: sensor
+            device_class: battery
+    lights:
+      name: Light to control
+      selector:
+        target:
+          entity: 
+            domain: light
+    brightness_step:
+      name: Brightness adjustment step
+      description: Amount to adjust brightness per click
+      selector:
+        number:
+          min: 1
+          max: 100
+          step: 1
+    adaptive_switch:
+      name: Adaptive Lights Switch
+      selector:
+        entity:
+          domain: switch
+    automatic_on_boolean:
+      name: Automatic ON boolean
+      description: Input boolean to keep track of automatic control for turning on the lights
+      selector:
+        entity:
+          domain: input_boolean
+    automatic_off_boolean:
+      name: Automatic OFF boolean
+      description: Input boolean to keep track of automatic control for turning off the lights
+      selector:
+        entity:
+          domain: input_boolean
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input remote
+
+action:
+  - variables:
+      command: '{{ trigger.event.data.command }}'
+      brightness_step: !input brightness_step
+  - choose:
+      - conditions:
+          - '{{ command == "on_short_release" }}'
+        sequence: 
+          - service: light.turn_on
+            target: !input lights
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input automatic_off_boolean
+          - service: input_boolean.turn_on
+            target:
+              entity_id: !input automatic_on_boolean
+      - conditions:
+        - '{{ command == "on_double_press" }}'
+        sequence:
+          - service: light.turn_on
+            target: !input lights
+            data:
+              color_temp: 230
+              brightness_pct: 100
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input automatic_off_boolean
+          - service: input_boolean.turn_on
+            target:
+              entity_id: !input automatic_on_boolean
+      - conditions:
+          - '{{ command == "on_hold" }}'
+        sequence: 
+          - service: switch.turn_on
+            target:
+              entity_id: !input adaptive_switch
+          - service: adaptive_lighting.set_manual_control
+            data:
+              entity_id: !input adaptive_switch
+              manual_control: false
+          - service: input_boolean.turn_on
+            target:
+              entity_id: !input automatic_on_boolean
+          - service: input_boolean.turn_on
+            target:
+              entity_id: !input automatic_off_boolean
+      - conditions: >
+          {{ command == 'up_short_release' or command == 'up_hold' }}  
+        sequence:
+          - service: light.turn_on
+            target: !input lights
+            data:
+              brightness_step_pct: '{{ brightness_step }}'
+      - conditions:
+          - '{{ command == "up_double_press" }}'
+        sequence:
+          - service: light.turn_on
+            target: !input lights
+            data:
+              color_temp: 230
+              brightness_pct: 100
+      - conditions: >
+          {{ command == 'down_short_release' or command == 'down_hold' }}
+        sequence:
+          - service: light.turn_on
+            target: !input lights
+            data:
+              brightness_step_pct: '{{ brightness_step * -1 }}'
+      - conditions:
+          - '{{ command == "down_double_press" }}'
+        sequence:
+          - service: light.turn_on
+            target: !input lights
+            data:
+              color_temp: 350
+              brightness_pct: 10
+      - conditions:
+          - '{{ command == "off_short_release" }}'
+        sequence:
+          - service: light.turn_off
+            target: !input lights
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input automatic_on_boolean
+          - service: input_boolean.turn_on
+            target:
+              entity_id: !input automatic_off_boolean
+      - conditions:
+          - '{{ command == "off_hold" }}'
+        sequence: 
+          - service: switch.turn_off
+            target:
+              entity_id: !input adaptive_switch
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input automatic_off_boolean
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input automatic_on_boolean
+

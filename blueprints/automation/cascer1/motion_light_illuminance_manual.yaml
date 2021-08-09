@@ -1,8 +1,8 @@
 blueprint:
-  name: Motion-activated Light with illuminance
+  name: Motion-activated Light with manual mode
   description: Turn on a light when motion is detected and light level is below a threshold.
   domain: automation
-  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/motion_light_illuminance.yaml
+  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/motion_light_illuminance_manual.yaml
   input:
     motion_entity:
       name: Motion Sensor
@@ -38,6 +38,18 @@ blueprint:
           step: 15
           max: 3600
           unit_of_measurement: seconds
+    power_on_boolean:
+      name: Power on enabled entity
+      description: This toggle enables or disables automatically turning on the lights with motion.
+      selector:
+        entity:
+          domain: input_boolean
+    power_off_boolean:
+      name: Power off enabled entity
+      description: This toggle enables or disables automatically turning off the lights.
+      selector:
+        entity:
+          domain: input_boolean
 
 # If motion is detected within the delay,
 # we restart the script.
@@ -50,12 +62,25 @@ trigger:
   from: "off"
   to: "on"
 
+condition:
+  - condition: or
+    conditions:
+      - condition: state
+        entity_id: !input power_on_boolean
+        state: 'on'
+      - condition: state
+        entity_id: !input power_off_boolean
+        state: 'on'
+
 action:
   - choose:
     - conditions:
       - condition: numeric_state
         entity_id: !input light_sensor
         below: !input light_level
+      - condition: state
+        entity_id: !input power_on_boolean
+        state: 'on'
       sequence:
         - service: light.turn_on
           target: !input light_target
@@ -65,5 +90,8 @@ action:
       from: "on"
       to: "off"
   - delay: !input no_motion_wait
+  - condition: state
+    entity_id: !input power_off_boolean
+    state: 'on'
   - service: light.turn_off
     target: !input light_target

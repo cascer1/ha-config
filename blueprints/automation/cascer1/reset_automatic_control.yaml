@@ -1,0 +1,39 @@
+blueprint:
+  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/reset_automatic_control.yaml
+  name: "Reset automatic control"
+  description: Reset automatic control booleans after inactivity in a room.
+  domain: automation
+  input:
+    motion_sensor:
+      name: Motion Sensor
+      selector:
+        entity:
+    automatic_on_boolean:
+      name: Automatic ON boolean
+      description: Input boolean to keep track of automatic control for turning on the lights
+      selector:
+        entity:
+          domain: input_boolean
+    automatic_off_boolean:
+      name: Automatic OFF boolean
+      description: Input boolean to keep track of automatic control for turning off the lights
+      selector:
+        entity:
+          domain: input_boolean
+
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: state
+    entity_id: !input motion_sensor
+    to: 'off'
+    for: '03:00:00'
+
+action:
+  - service: input_boolean.turn_on
+    target:
+      entity_id: !input automatic_on_boolean
+  - service: input_boolean.turn_on
+    target:
+      entity_id: !input automatic_off_boolean
