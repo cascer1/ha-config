@@ -226,42 +226,122 @@
   name: dnd_travel_day
   entities:
     light.dining_table_up:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
       color_mode: hs
       brightness: 254
       hs_color:
       - 181.579
       - 14.902
+      rgb_color:
+      - 216
+      - 253
+      - 255
+      xy_color:
+      - 0.282
+      - 0.33
+      off_brightness:
+      friendly_name: dining table up
+      supported_features: 63
       state: 'on'
     light.dining_table_down:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
       color_mode: color_temp
       brightness: 189
-      color_temp: 318
+      color_temp: 437
+      off_brightness:
+      friendly_name: dining table down
+      supported_features: 63
       state: 'on'
     light.kitchen_ceiling:
-      color_mode: color_temp
-      brightness: 254
-      color_temp: 193
-      state: 'on'
+      min_mireds: 153
+      max_mireds: 454
+      supported_color_modes:
+      - color_temp
+      off_brightness:
+      friendly_name: kitchen ceiling
+      supported_features: 43
+      state: 'off'
     light.kitchen_cabinets:
+      supported_color_modes:
+      - brightness
       color_mode: brightness
       brightness: 254
+      off_brightness:
+      friendly_name: kitchen cabinets
+      supported_features: 41
       state: 'on'
     light.living_room_ceiling:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
       color_mode: hs
       brightness: 254
       hs_color:
       - 195.413
       - 42.745
+      rgb_color:
+      - 146
+      - 226
+      - 255
+      xy_color:
+      - 0.219
+      - 0.297
+      off_brightness:
+      friendly_name: living room ceiling
+      supported_features: 63
       state: 'on'
     light.living_room_corner:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - colorloop
+      supported_color_modes:
+      - color_temp
+      - hs
       color_mode: hs
       brightness: 254
       hs_color:
       - 181.579
       - 14.902
+      rgb_color:
+      - 216
+      - 253
+      - 255
+      xy_color:
+      - 0.282
+      - 0.33
+      off_brightness:
+      friendly_name: living room corner
+      supported_features: 63
       state: 'on'
     switch.adaptive_lighting_downstairs:
+      brightness_pct:
+      color_temp_kelvin:
+      color_temp_mired:
+      rgb_color:
+      xy_color:
+      hs_color:
+      sun_position:
+      friendly_name: 'Adaptive Lighting: Downstairs'
+      icon: mdi:theme-light-dark
       state: 'off'
+  icon: mdi:walk
 - id: dnd_travel_night
   name: dnd_travel_night
   entities:

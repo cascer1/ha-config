@@ -19,6 +19,9 @@ http:
 # Learn more at https://www.home-assistant.io/integrations/default_config
 default_config:
 
+frontend:
+  themes: !include_dir_merge_named themes
+
 google_assistant: !include google_assistant.yaml
 
 # Text to speech
@@ -78,3 +81,4 @@ input_text: !include input_text.yaml
 input_datetime: !include input_datetime.yaml
 input_boolean: !include input_boolean.yaml
 input_select: !include input_select.yaml
+template: !include templates.yaml

@@ -18,3 +18,7 @@ alarm_time:
   name: Wake up alarm time
   has_date: true
   has_time: true
+end_of_month:
+  name: End of month
+  has_date: true
+  has_time: true

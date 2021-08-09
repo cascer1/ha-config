@@ -1,0 +1,58 @@
+- sensor:
+  - name: "Solar lifetime energy"
+    unique_id: solar_lifetime_energy
+    state: "{{ (states('sensor.solaredge_lifetime_energy') | float ) / 1000 | round(3) }}"
+    unit_of_measurement: "kWh"
+    state_class: measurement
+  - name: "Energy Consumption (Total)"
+    unique_id: energy_consumption_total_custom
+    unit_of_measurement: "kWh"
+    state_class: measurement
+    state: "{{ (states('sensor.energy_consumption_tarif_1')|float + states('sensor.energy_consumption_tarif_2')|float) | round(3) }}"
+  - name: "Energy Production (Total)"
+    unique_id: energy_production_total_custom
+    unit_of_measurement: "kWh"
+    state_class: measurement
+    state: "{{ (states('sensor.energy_production_tarif_1')|float + states('sensor.energy_production_tarif_2')|float) | round(3) }}"
+  - name: "Power Consumption Watt"
+    unique_id: power_consumption_watt
+    unit_of_measurement: "W"
+    state_class: measurement
+    state: "{{ (states('sensor.power_consumption')|float) * 1000 }}"
+  - name: "Power Production Watt"
+    unique_id: power_production_watt
+    unit_of_measurement: "W"
+    state_class: measurement
+    state: "{{ (states('sensor.power_production')|float) * 1000 }}"
+  - name: "Energy Consumption Total Watt"
+    unique_id: energy_consumption_total_watt
+    unit_of_measurement: "Wh"
+    state_class: measurement
+    state: "{{ (states('sensor.energy_consumption_total_custom') | float) * 1000 | round(3) }}"
+  - name: "Energy Production Total Watt"
+    unique_id: energy_production_total_watt
+    unit_of_measurement: "Wh"
+    state_class: measurement
+    state: "{{ (states('sensor.energy_production_total_custom') | float) * 1000 | round(3) }}"
+  - name: "Energy Consumption Total Daily"
+    unique_id: energy_consumption_total_daily
+    unit_of_measurement: "kWh"
+    state_class: measurement
+    state: "{{ (states('sensor.energy_daily_high_meter') | float) + (states('sensor.energy_daily_low_meter') | float) }}"
+  - name: "Energy Production Total Daily"
+    unique_id: energy_production_total_daily
+    unit_of_measurement: "kWh"
+    state_class: measurement
+    state: "{{ (states('sensor.energy_production_daily_high_meter') | float) + (states('sensor.energy_production_daily_low_meter') | float) }}"
+  - name: "Energy Consumption Total Monthly"
+    unique_id: energy_consumption_total_monthly
+    unit_of_measurement: "kWh"
+    state_class: measurement
+    state: "{{ (states('sensor.energy_monthly_high_meter') | float) + (states('sensor.energy_monthly_low_meter') | float) }}"
+  - name: "Energy Production Total Monthly"
+    unique_id: energy_production_total_monthly
+    unit_of_measurement: "kWh"
+    state_class: measurement
+    state: "{{ (states('sensor.energy_production_monthly_high_meter') | float) + (states('sensor.energy_production_monthly_low_meter') | float) }}"
+
+

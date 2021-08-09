@@ -207,19 +207,11 @@
   description: Reset states for daily events
   trigger:
   - platform: time
-    at: 03:00:00
+    at: 06:00:00
+  condition: []
   action:
   - service: input_boolean.turn_off
     entity_id: input_boolean.woken_up
-  - service: light.turn_off
-    data: {}
-    target:
-      entity_id:
-      - light.downstairs
-      - light.outside
-  - service: switch.turn_off
-    target:
-      entity_id: switch.adaptive_lighting_bedroom
   mode: single
 - id: night_time_toggle
   alias: Turn off night mode
@@ -349,18 +341,20 @@
   alias: Light switch office
   description: ''
   use_blueprint:
-    path: cascer1/zha_philips_dimmer_adaptive_lights.yaml
+    path: cascer1/zha_philips_dimmer_adaptive_lights_manual.yaml
     input:
       remote: 0c4da719bcb63f5906a981887107b46c
-      lights:
-        entity_id: light.office_ceiling
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_office
+      automatic_on_boolean: input_boolean.office_light_automatic_on
+      automatic_off_boolean: input_boolean.office_light_automatic_off
+      lights:
+        entity_id: light.office_ceiling
 - id: '1625655627109'
   alias: light switch side kitchen
   description: ''
   use_blueprint:
-    path: cascer1/zha_philips_dimmer_adaptive_lights.yaml
+    path: cascer1/zha_philips_dimmer_adaptive_lights_manual.yaml
     input:
       remote: 725f1bc736179cea1cbacc1246b50efc
       lights:
@@ -368,28 +362,37 @@
         - light.side_kitchen_lights_zha_group_0x0002
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_side_kitchen
+      automatic_on_boolean: input_boolean.side_kitchen_light_automatic_on
+      automatic_off_boolean: input_boolean.side_kitchen_light_automatic_off
 - id: '1625655673754'
   alias: light switch kitchen
   description: ''
   use_blueprint:
-    path: cascer1/zha_philips_dimmer_adaptive_lights.yaml
+    path: cascer1/zha_philips_dimmer_adaptive_lights_manual.yaml
     input:
       remote: 2498812930e32477ec650a77852af040
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_downstairs
       lights:
         entity_id: light.kitchen_lights_zha_group_0x0005
+      automatic_on_boolean: input_boolean.living_room_light_automatic_on
+      automatic_off_boolean: input_boolean.living_room_light_automatic_off
 - id: '1625655734660'
   alias: light switch living room
   description: ''
   use_blueprint:
-    path: cascer1/zha_philips_dimmer_adaptive_lights.yaml
+    path: cascer1/zha_philips_dimmer_adaptive_lights_manual.yaml
     input:
       remote: 61dafb48861c8abf564ec83f1ce11449
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_downstairs
+      automatic_on_boolean: input_boolean.living_room_light_automatic_on
+      automatic_off_boolean: input_boolean.living_room_light_automatic_off
       lights:
-        entity_id: light.downstairs_lights_zha_group_0x0004
+        entity_id:
+        - light.tv_zha_group_0x0009
+        - light.dining_table_zha_group_0x0007
+        - light.kitchen_lights_zha_group_0x0005
 - id: '1625656128887'
   alias: light switch bedroom wall
   description: ''
@@ -412,6 +415,12 @@
     entity_id: group.awesome_people
     state: home
   action:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.adaptive_lighting_bedroom
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.woken_up
   - service: scene.turn_on
     target:
       entity_id: scene.morning_lights
@@ -476,17 +485,20 @@
   - service: script.determine_alarm_light_fade_time
   mode: single
 - id: '1626347682611'
-  alias: Motion living room
+  alias: motion living room
   description: ''
   use_blueprint:
-    path: cascer1/motion_light_illuminance.yaml
+    path: cascer1/motion_light_illuminance_manual.yaml
     input:
+      light_level: 300
+      no_motion_wait: 1800
       light_target:
-        entity_id: light.downstairs
-      motion_entity: group.living_room_motion
+        entity_id:
+        - light.downstairs_lights_zha_group_0x0004
       light_sensor: sensor.living_room_illuminance
-      light_level: 200
-      no_motion_wait: 900
+      motion_entity: group.living_room_motion
+      power_on_boolean: input_boolean.living_room_light_automatic_on
+      power_off_boolean: input_boolean.living_room_light_automatic_off
 - id: '1626362518806'
   alias: motion while away
   description: ''
@@ -520,23 +532,68 @@
   alias: Motion side kitchen
   description: ''
   use_blueprint:
-    path: cascer1/motion_light_illuminance.yaml
+    path: cascer1/motion_light_illuminance_manual.yaml
     input:
       motion_entity: binary_sensor.motion_d_activity
       light_sensor: sensor.motion_d_illuminance
+      no_motion_wait: 90
       light_target:
         entity_id: light.side_kitchen_lights_zha_group_0x0002
-      light_level: 400
-      no_motion_wait: 60
-- id: '1626441632954'
+      power_on_boolean: input_boolean.side_kitchen_light_automatic_on
+      power_off_boolean: input_boolean.side_kitchen_light_automatic_off
+      light_level: 300
+- id: '1627379539423'
   alias: motion office
   description: ''
   use_blueprint:
-    path: cascer1/motion_light_illuminance.yaml
+    path: cascer1/motion_light_illuminance_manual.yaml
     input:
       motion_entity: binary_sensor.motion_c_activity
       light_sensor: sensor.motion_c_illuminance
       light_target:
         entity_id: light.office_ceiling
-      light_level: 120
-      no_motion_wait: 900
+      light_level: 200
+      no_motion_wait: 1800
+      power_on_boolean: input_boolean.office_light_automatic_on
+      power_off_boolean: input_boolean.office_light_automatic_off
+- id: '1627391476634'
+  alias: Reset living automatic control
+  description: ''
+  use_blueprint:
+    path: cascer1/reset_automatic_control.yaml
+    input:
+      motion_sensor: group.living_room_motion
+      automatic_on_boolean: input_boolean.living_room_light_automatic_on
+      automatic_off_boolean: input_boolean.living_room_light_automatic_off
+- id: '1627391516741'
+  alias: Reset office automatic control
+  description: ''
+  use_blueprint:
+    path: cascer1/reset_automatic_control.yaml
+    input:
+      motion_sensor: binary_sensor.motion_c_activity
+      automatic_on_boolean: input_boolean.office_light_automatic_on
+      automatic_off_boolean: input_boolean.office_light_automatic_off
+- id: '1627391800496'
+  alias: Reset side kitchen automatic control
+  description: ''
+  use_blueprint:
+    path: cascer1/reset_automatic_control.yaml
+    input:
+      motion_sensor: binary_sensor.motion_d_activity
+      automatic_on_boolean: input_boolean.side_kitchen_light_automatic_on
+      automatic_off_boolean: input_boolean.side_kitchen_light_automatic_off
+- id: '1627455358038'
+  alias: Sonos off when living room is empty
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: group.living_room_motion
+    to: 'off'
+    for: 02:00:00
+  condition: []
+  action:
+  - service: media_player.media_pause
+    target:
+      entity_id: media_player.living_room_sonos
+  mode: single

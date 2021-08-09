@@ -7,3 +7,15 @@ night_time:
 house_occupied:
   name: House is occupied
   icon: fapro:house-return
+office_light_automatic_on:
+  name: Office light automatic on
+office_light_automatic_off:
+  name: Office light automatic off
+side_kitchen_light_automatic_on:
+  name: Side kitchen light automatic on
+side_kitchen_light_automatic_off:
+  name: Side kitchen light automatic off
+living_room_light_automatic_on:
+  name: Living room light automatic on
+living_room_light_automatic_off:
+  name: Living room light automatic off

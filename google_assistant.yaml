@@ -38,13 +38,6 @@
       name: Side Kitchen Lights
       aliases:
         - Shed Lights
-    light.tv_zha_group_0x0009:
-      name: TV Lights
-      aliases:
-        - Entertainment Lights
-        - Television Lights
-        - Front Lights
-        - Sitting Lights
     climate.living_room:
       name: Living Room AC
     climate.bedroom:
