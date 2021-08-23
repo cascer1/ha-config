@@ -46,3 +46,19 @@
   duration:
     minutes: 5
   process_undef_as: 0
+- platform: average
+  unique_id: average_power_plug_1
+  name: Average Power Shelly Plug 1
+  entities:
+    - sensor.shelly_plug_1_power
+  duration:
+    minutes: 5
+  process_undef_as: 0
+- platform: average
+  unique_id: average_power_plug_2
+  name: Average Power Shelly Plug 2
+  entities:
+    - sensor.shelly_plug_2_power
+  duration:
+    minutes: 5
+  process_undef_as: 0

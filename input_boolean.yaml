@@ -19,3 +19,20 @@ living_room_light_automatic_on:
   name: Living room light automatic on
 living_room_light_automatic_off:
   name: Living room light automatic off
+powercalc_google_asssitant_devices:
+  name: Powercalc Google Assistant devices
+  initial: true
+powercalc_network_devices:
+  name: Powercalc networking devices
+  initial: true
+powercalc_nas:
+  name: Powercalc nas
+  initial: true
+office_heat:
+  name: Office heat required
+bathroom_heat:
+  name: Bathroom heat required
+hallway_heat:
+  name: Hallway heat required
+scullery_heat:
+  name: Scullery heat required

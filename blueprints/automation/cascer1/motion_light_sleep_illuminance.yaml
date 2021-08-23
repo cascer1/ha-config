@@ -1,33 +1,25 @@
 blueprint:
-  name: Motion-activated Light with manual mode
-  description: Turn on a light when motion is detected and light level is below a threshold.
+  name: Motion-activated Light based with illuminance and sleep
+  description: Turn on a light when motion is detected and the illuminance is below a given amount. Also supports sleep mode.
   domain: automation
-  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/motion_light_illuminance_manual.yaml
+  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/motion_light_illuminance_sleep.yaml
   input:
     motion_entity:
       name: Motion Sensor
       selector:
         entity:
-    light_sensor:
-      name: Light Level Sensor
-      selector:
-        entity:
-          device_class: illuminance
     light_target:
       name: Light
       selector:
         target:
           entity:
             domain: light
-    light_level:
-      name: Light level
-      description: Light level below which to turn on the lights.
+    sleep_light_target:
+      name: Sleep Lights
       selector:
-        number:
-          min: 0
-          max: 400
-          step: 10
-          unit_of_measurement: lx
+        target:
+          entity:
+            domain: light
     no_motion_wait:
       name: Wait time
       description: Time to leave the light on after last motion is detected.
@@ -38,18 +30,26 @@ blueprint:
           step: 15
           max: 3600
           unit_of_measurement: seconds
-    power_on_boolean:
-      name: Power on enabled entity
-      description: This toggle enables or disables automatically turning on the lights with motion.
+    light_sensor:
+      name: Light Level Sensor
       selector:
         entity:
-          domain: input_boolean
-    power_off_boolean:
-      name: Power off enabled entity
-      description: This toggle enables or disables automatically turning off the lights.
+          device_class: illuminance
+    light_level:
+      name: Light Level
+      description: Light level gelow which to turn on the lights.
+      selector:
+        number:
+          min: 0
+          max: 500
+          step: 10
+          unit_of_measurement: lx
+    sleep_mode_switch:
+      name: Sleep Mode Switch
+      description: Switch that tracks sleep mode
       selector:
         entity:
-          domain: input_boolean
+          domain: switch
 
 # If motion is detected within the delay,
 # we restart the script.
@@ -62,16 +62,6 @@ trigger:
   from: "off"
   to: "on"
 
-condition:
-  - condition: or
-    conditions:
-      - condition: state
-        entity_id: !input power_on_boolean
-        state: 'on'
-      - condition: state
-        entity_id: !input power_off_boolean
-        state: 'on'
-
 action:
   - choose:
     - conditions:
@@ -79,8 +69,18 @@ action:
         entity_id: !input light_sensor
         below: !input light_level
       - condition: state
-        entity_id: !input power_on_boolean
+        entity_id: !input sleep_mode_switch
         state: 'on'
+      sequence:
+        - service: light.turn_on
+          target: !input sleep_light_target
+    - conditions:
+      - condition: numeric_state
+        entity_id: !input light_sensor
+        below: !input light_level
+      - condition: state
+        entity_id: !input sleep_mode_switch
+        state: 'off'
       sequence:
         - service: light.turn_on
           target: !input light_target
@@ -90,9 +90,6 @@ action:
       from: "on"
       to: "off"
   - delay: !input no_motion_wait
-  - condition: state
-    entity_id: !input power_off_boolean
-    state: 'on'
   - service: light.turn_off
     target: !input light_target
   - delay: 5

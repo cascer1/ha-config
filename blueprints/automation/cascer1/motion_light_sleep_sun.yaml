@@ -1,0 +1,95 @@
+blueprint:
+  name: Motion-activated Light based with sun and sleep
+  description: Turn on a light when motion is detected and the sun is above a given angle. Also supports sleep mode.
+  domain: automation
+  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/motion_light_sun_sleep.yaml
+  input:
+    motion_entity:
+      name: Motion Sensor
+      selector:
+        entity:
+    light_target:
+      name: Light
+      selector:
+        target:
+          entity:
+            domain: light
+    sleep_light_target:
+      name: Sleep Lights
+      selector:
+        target:
+          entity:
+            domain: light
+    no_motion_wait:
+      name: Wait time
+      description: Time to leave the light on after last motion is detected.
+      default: 120
+      selector:
+        number:
+          min: 0
+          step: 15
+          max: 3600
+          unit_of_measurement: seconds
+    sun_angle:
+      name: Solar Elevation
+      description: Maximum solar elevation to turn on the lights
+      default: 5
+      selector:
+        number:
+          min: -180
+          max: 180
+          step: 5
+          unit_of_measurement: degrees
+    sleep_mode_switch:
+      name: Sleep Mode Switch
+      description: Switch that tracks sleep mode
+      selector:
+        entity:
+          domain: switch
+
+# If motion is detected within the delay,
+# we restart the script.
+mode: restart
+max_exceeded: silent
+
+trigger:
+  platform: state
+  entity_id: !input motion_entity
+  from: "off"
+  to: "on"
+
+action:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sun.sun
+        attribute: elevation
+        below: !input sun_angle
+      - condition: state
+        entity_id: !input sleep_mode_switch
+        state: 'on'
+      sequence:
+        - service: light.turn_on
+          target: !input sleep_light_target
+    - conditions:
+      - condition: numeric_state
+        entity_id: sun.sun
+        attribute: elevation
+        below: !input sun_angle
+      - condition: state
+        entity_id: !input sleep_mode_switch
+        state: 'off'
+      sequence:
+        - service: light.turn_on
+          target: !input light_target
+  - wait_for_trigger:
+    - platform: state
+      entity_id: !input motion_entity
+      from: "on"
+      to: "off"
+  - delay: !input no_motion_wait
+  - service: light.turn_off
+    target: !input light_target
+  - delay: 5
+  - service: light.turn_off
+    target: !input light_target

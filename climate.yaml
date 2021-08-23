@@ -1,0 +1,44 @@
+- platform: generic_thermostat
+  name: Office
+  heater: input_boolean.office_heat
+  target_sensor: sensor.temp_c_temperature
+  min_temp: 14
+  max_temp: 25
+  min_cycle_duration:
+    seconds: 20
+  away_temp: 14
+  initial_hvac_mode: "heat"
+  precision: 0.5
+- platform: generic_thermostat
+  name: Bathroom
+  heater: input_boolean.bathroom_heat
+  target_sensor: sensor.temp_d_temperature
+  min_temp: 14
+  max_temp: 25
+  min_cycle_duration:
+    seconds: 20
+  away_temp: 14
+  initial_hvac_mode: "heat"
+  precision: 0.5
+- platform: generic_thermostat
+  name: Scullery
+  heater: input_boolean.scullery_heat
+  target_sensor: sensor.temp_a_temperature
+  min_temp: 10
+  max_temp: 25
+  min_cycle_duration:
+    seconds: 20
+  away_temp: 14
+  initial_hvac_mode: "heat"
+  precision: 0.5
+- platform: generic_thermostat
+  name: Hallway
+  heater: input_boolean.hallway_heat
+  target_sensor: sensor.temp_b_temperature
+  min_temp: 14
+  max_temp: 25
+  min_cycle_duration:
+    seconds: 20
+  away_temp: 14
+  initial_hvac_mode: "heat"
+  precision: 0.5

@@ -34,6 +34,12 @@ sonos:
       - !secret network_sonos_host
     advertise_addr: !secret network_hass_host
 
+powercalc:
+  scan_interval: 00:20:00
+  create_energy_sensors: true
+  power_sensor_naming: "{} Power"
+  energy_sensor_naming: "{} Energy"
+
 recorder:
   commit_interval: 10
   exclude:
@@ -74,6 +80,8 @@ scene: !include scenes.yaml
 binary_sensor: !include binary_sensors.yaml
 light: !include lights.yaml
 sensor: !include sensors.yaml
+sensor powercalc: !include powercalc_sensors.yaml
+  #sensor energy: !include energy_sensors.yaml
 notify: !include notify.yaml
 utility_meter: !include utility_meter.yaml
 input_number: !include input_numbers.yaml
@@ -82,3 +90,4 @@ input_datetime: !include input_datetime.yaml
 input_boolean: !include input_boolean.yaml
 input_select: !include input_select.yaml
 template: !include templates.yaml
+climate: !include climate.yaml

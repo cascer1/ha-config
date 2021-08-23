@@ -9,13 +9,15 @@ thermostat_away:
       entity_id:
       - climate.bedroom
       - climate.living_room
-  - condition: state
-    entity_id: climate.tstat_8d728f
-    state: heat
-  - service: climate.set_temperature
-    entity_id: climate.tstat_8d728f
+  - service: climate.set_preset_mode
+    target:
+      entity_id:
+      - climate.office
+      - climate.hallway
+      - climate.bathroom
+      - climate.scullery
     data:
-      temperature: '{{ states(''input_number.away_temperature'') | float }}'
+      preset_mode: Away
 thermostat_home:
   alias: Thermostat to home
   description: Set the thermostat temperature to the configured home temperature
@@ -23,13 +25,6 @@ thermostat_home:
   mode: single
   sequence:
   - service: script.reload_climate_automations
-  - condition: state
-    entity_id: climate.tstat_8d728f
-    state: heat
-  - service: climate.set_temperature
-    entity_id: climate.tstat_8d728f
-    data:
-      temperature: '{{ states(''input_number.home_temperature'') | float }}'
 lights_not_home:
   alias: Lights not home
   description: Set the lights when leaving home, depending on daylight
@@ -183,7 +178,7 @@ doorbell:
       light_entity:
         entity_id:
         - light.office_ceiling
-        - light.side_kitchen_ceiling_1
+        - light.side_kitchen_lights_zha_group_0x0002
       adaptive_light_entity:
         entity_id:
         - switch.adaptive_lighting_office
@@ -211,16 +206,13 @@ reload_climate_automations:
   sequence:
   - service: scheduler.run_action
     data:
-      entity_id: switch.schedule_living_room_heating_workdays
+      entity_id: switch.schedule_heat_bathroom
   - service: scheduler.run_action
     data:
-      entity_id: switch.schedule_living_room_cooling_workdays
+      entity_id: switch.schedule_heat_hallway
   - service: scheduler.run_action
     data:
-      entity_id: switch.schedule_living_room_heating_weekends
-  - service: scheduler.run_action
-    data:
-      entity_id: switch.schedule_living_room_cooling_weekends
+      entity_id: switch.schedule_office_heating
   - choose:
     - conditions:
       - condition: state
@@ -229,7 +221,11 @@ reload_climate_automations:
       sequence:
       - service: climate.turn_off
         target:
-          entity_id: climate.tstat_8d728f
+          entity_id:
+          - climate.tstat_8d728f
+          - climate.office
+          - climate.hallway
+          - climate.bathroom
     default: []
   mode: single
   icon: fapro:sync
@@ -243,13 +239,14 @@ thermostat_sleep:
     target:
       entity_id:
       - climate.living_room
-  - condition: state
-    entity_id: climate.tstat_8d728f
-    state: heat
-  - service: climate.set_temperature
-    entity_id: climate.tstat_8d728f
+  - service: climate.set_preset_mode
+    target:
+      entity_id:
+      - climate.office
+      - climate.hallway
+      - climate.bathroom
     data:
-      temperature: '{{ states(''input_number.away_temperature'') | float }}'
+      preset_mode: Away
 flash_light:
   alias: Flash Light
   mode: queued
@@ -378,3 +375,23 @@ determine_alarm_light_fade_time:
         entity_id: input_datetime.alarm_time
       data:
         timestamp: '9999999000'
+determine_last_day_of_month:
+  alias: Determine last day of month
+  sequence:
+  - service: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.end_of_month
+    data:
+      datetime: "{%- macro last_dayofmonth(month, year) -%}\n  {%- set daysinmonths\
+        \ = [31,28,31,30,31,30,31,31,30,31,30,31] -%}\n  {%- set month = month|int\
+        \ -%}  \n  {%- set year = year|int -%}\n  {# Simplified leap year calculation.\
+        \ See https://www.mathsisfun.com/leap-years.html #}\n  {%- set isleapyear\
+        \ = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) -%}\n  {%- set\
+        \ monthindex = month-1 -%}\n  {%- if month == 2 and isleapyear -%}\n    {{\
+        \ daysinmonths[monthindex]+1 }}\n  {%- else -%}\n    {{ daysinmonths[monthindex]\
+        \ }}\n  {%- endif -%}\n{%- endmacro -%} {%- set month = now().month -%} {%-\
+        \ set year = now().year -%} {%- set lastDay = last_dayofmonth(month, year)\
+        \ -%} {%- set lastDayDateString = (year | string) + \"-\" + (month | string)\
+        \ + \"-\" + (lastDay | string) + \"T23:59:55\" -%} {%- set lastDayDate = as_datetime(lastDayDateString)\
+        \ -%} {{ lastDayDate }}"
+  mode: single

@@ -2,6 +2,7 @@
     name: Upstairs
     entities:
       - light.bedroom_lights_zha_group_0x0003
+      - light.hallway_upstairs_zha_group_0x000c
       - light.office_ceiling
   - platform: group
     name: Downstairs

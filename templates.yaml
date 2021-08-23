@@ -54,5 +54,32 @@
     unit_of_measurement: "kWh"
     state_class: measurement
     state: "{{ (states('sensor.energy_production_monthly_high_meter') | float) + (states('sensor.energy_production_monthly_low_meter') | float) }}"
-
-
+  - name: "Energy Usage Lights"
+    unique_id: energy_usage_lights
+    unit_of_measurement: "kWh"
+    state_class: measurement
+    state: "{{  (
+( states('sensor.bedroom_ceiling_1_energy') | float ) +
+( states('sensor.bedroom_ceiling_2_energy') | float ) +
+( states('sensor.dining_table_down_energy') | float ) +
+( states('sensor.dining_table_up_energy') | float ) +
+( states('sensor.kitchen_cabinets_energy') | float ) +
+( states('sensor.kitchen_ceiling_energy') | float ) +
+( states('sensor.living_room_ceiling_energy') | float ) +
+( states('sensor.living_room_corner_energy') | float ) +
+( states('sensor.office_ceiling_energy') | float ) +
+( states('sensor.side_kitchen_cabinets_energy') | float ) +
+( states('sensor.side_kitchen_ceiling_1_energy') | float ) +
+( states('sensor.side_kitchen_ceiling_2_energy') | float ) +
+( states('sensor.side_kitchen_window_energy') | float ) +
+( states('sensor.upstairs_hallway_ceiling_energy') | float ) +
+( states('sensor.upstairs_hallway_spot_stairs_energy') | float ) +
+( states('sensor.upstairs_hallway_spot_wall_energy') | float )
+      ) | round(3)
+}}"
+  binary_sensor:
+    - name: "Heating required"
+      unique_id: heating_required
+      state: "{{ states('input_boolean.office_heat') == 'on'
+        or states('input_boolean.hallway_heat') == 'on'
+        or states('input_boolean.bathroom_heat') == 'on' }}"

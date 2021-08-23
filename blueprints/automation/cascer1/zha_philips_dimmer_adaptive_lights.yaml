@@ -33,7 +33,8 @@ blueprint:
         entity:
           domain: switch
 
-mode: restart
+mode: queued
+max: 5
 max_exceeded: silent
 
 trigger:

@@ -45,7 +45,8 @@ blueprint:
         entity:
           domain: input_boolean
 
-mode: restart
+mode: queued
+max: 5
 max_exceeded: silent
 
 trigger:

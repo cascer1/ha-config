@@ -51,19 +51,10 @@
     from: 'off'
     to: 'on'
   action:
-  - choose:
-    - conditions:
-      - condition: numeric_state
-        entity_id: sun.sun
-        attribute: elevation
-        below: input_number.sun_elevation_dark
-      sequence:
-      - service: script.lights_home
-    default: []
+  - service: script.thermostat_home
   - condition: time
     after: input_datetime.morning_time
     before: input_datetime.night_time
-  - service: script.thermostat_home
   - service: script.home_music
   mode: single
 - id: sun_setting
@@ -114,10 +105,8 @@
   alias: Store monthly utility usage
   trigger:
   - platform: time
-    at: '23:59:55'
-  condition:
-  - condition: template
-    value_template: '{{now().day == 14}}'
+    at: input_datetime.end_of_month
+  condition: []
   action:
   - service: notify.utilitymonthly
     data_template:
@@ -274,6 +263,7 @@
     entity_id:
     - switch.adaptive_lighting_sleep_mode_bedroom
     - switch.adaptive_lighting_sleep_mode_downstairs
+    - switch.adaptive_lighting_sleep_mode_hallway
   variables:
     sleep_mode: '{{ states(''input_boolean.night_time'') }}'
   mode: single
@@ -306,6 +296,9 @@
           entity_id:
           - climate.living_room
           - climate.bedroom
+          - climate.bathroom
+          - climate.hallway
+          - climate.office
     default:
     - service: script.reload_climate_automations
   mode: single
@@ -386,13 +379,13 @@
       remote: 61dafb48861c8abf564ec83f1ce11449
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_downstairs
-      automatic_on_boolean: input_boolean.living_room_light_automatic_on
       automatic_off_boolean: input_boolean.living_room_light_automatic_off
+      automatic_on_boolean: input_boolean.living_room_light_automatic_on
       lights:
         entity_id:
         - light.tv_zha_group_0x0009
-        - light.dining_table_zha_group_0x0007
         - light.kitchen_lights_zha_group_0x0005
+        - light.dining_table_zha_group_0x0007
 - id: '1625656128887'
   alias: light switch bedroom wall
   description: ''
@@ -490,15 +483,16 @@
   use_blueprint:
     path: cascer1/motion_light_illuminance_manual.yaml
     input:
-      light_level: 300
+      light_level: 200
       no_motion_wait: 1800
-      light_target:
-        entity_id:
-        - light.downstairs_lights_zha_group_0x0004
       light_sensor: sensor.living_room_illuminance
       motion_entity: group.living_room_motion
       power_on_boolean: input_boolean.living_room_light_automatic_on
       power_off_boolean: input_boolean.living_room_light_automatic_off
+      light_target:
+        entity_id:
+        - light.tv_zha_group_0x0009
+        - light.dining_table_zha_group_0x0007
 - id: '1626362518806'
   alias: motion while away
   description: ''
@@ -597,3 +591,142 @@
     target:
       entity_id: media_player.living_room_sonos
   mode: single
+- id: '1628594764783'
+  alias: Notify motion scullery
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_d_activity
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - service: notify.mobile_app_cas_phone
+    data:
+      title: Motion in scullery
+      message: motion in scullery
+  mode: single
+- id: '1628666368372'
+  alias: Maximum temperature when away
+  description: Ensure temperature range while nobody is home
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.temp_b_temperature
+    above: '35'
+    for: 01:00:00
+  - platform: numeric_state
+    entity_id: sensor.temp_c_temperature
+    above: '35'
+    for: 01:00:00
+  - platform: numeric_state
+    entity_id: sensor.tstat_8d728f_current_temperature
+    above: '35'
+    for: 01:00:00
+  condition:
+  - condition: state
+    entity_id: input_boolean.house_occupied
+    state: 'off'
+  action:
+  - service: climate.turn_on
+    target:
+      entity_id:
+      - climate.bedroom
+      - climate.living_room
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - service: climate.set_hvac_mode
+    target:
+      entity_id:
+      - climate.living_room
+      - climate.bedroom
+    data:
+      hvac_mode: cool
+  - delay:
+      hours: 0
+      minutes: 30
+      seconds: 0
+      milliseconds: 0
+  - service: climate.turn_off
+    target:
+      entity_id:
+      - climate.bedroom
+      - climate.living_room
+  mode: single
+- id: '1628782433508'
+  alias: motion kitchen
+  description: ''
+  use_blueprint:
+    path: cascer1/motion_light_illuminance_manual.yaml
+    input:
+      no_motion_wait: 1800
+      power_on_boolean: input_boolean.living_room_light_automatic_on
+      power_off_boolean: input_boolean.living_room_light_automatic_off
+      motion_entity: binary_sensor.motion_a_activity
+      light_target:
+        entity_id: light.kitchen_lights_zha_group_0x0005
+      light_sensor: sensor.motion_a_illuminance
+      light_level: 400
+- id: '1629107975223'
+  alias: Toggle heating system
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.heating_required
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.heating_required
+        state: 'on'
+      sequence:
+      - service: climate.set_temperature
+        target:
+          entity_id: climate.tstat_8d728f
+        data:
+          temperature: 25
+          hvac_mode: heat
+    default:
+    - service: climate.turn_off
+      target:
+        entity_id: climate.tstat_8d728f
+  mode: single
+- id: '1629270475151'
+  alias: Notify motion downstairs
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.motion_a_activity
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.motion_b_activity
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - service: notify.mobile_app_cas_phone
+    data:
+      title: motion downstairs
+      message: motion downstairs
+  mode: single
+- id: '1629657109466'
+  alias: Motion hallway upstairs
+  description: ''
+  use_blueprint:
+    path: cascer1/motion_light_sleep_illuminance.yaml
+    input:
+      motion_entity: binary_sensor.motion_e_activity
+      light_target:
+        entity_id: light.hallway_upstairs_zha_group_0x000c
+      sleep_light_target:
+        entity_id:
+        - light.upstairs_hallway_ceiling
+        - light.upstairs_hallway_spot_stairs
+      no_motion_wait: 30
+      light_sensor: sensor.motion_e_illuminance
+      light_level: 100
+      sleep_mode_switch: switch.adaptive_lighting_sleep_mode_hallway_upstairs
