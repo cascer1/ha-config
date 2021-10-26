@@ -1,0 +1,220 @@
+blueprint:
+  name: Motion lights with scenes
+  description: "Motion automation adapted from https://gist.github.com/networkingcat/a1876d7e706e07c8bdcf974113940fb8"
+  domain: automation
+  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/motion_light_scenes.yaml
+  input:
+    motion_entity:
+      name: Motion Sensor
+      description: Motion Sensor or a group with Motion Sensors (But can be anything switching between "on" and "off")
+      selector:
+        entity: {}
+    light_target:
+      name: Light
+      selector:
+        target:
+          entity:
+            domain: light
+    no_motion_wait:
+      name: Wait time
+      description: Time to leave the light on after last motion is detected.
+      default: 120
+      selector:
+        number:
+          min: 0.0
+          max: 3600.0
+          unit_of_measurement: seconds
+          mode: slider
+          step: 1.0
+    automation_blocker:
+      name: Automation Blocker (Optional)
+      description: Only run if this boolean is in desired state
+      default:
+      selector:
+        entity: {}
+    automation_blocker_boolean:
+      name: Automation Blocker Chooser (Optional)
+      description: Desired state of automation blocker.
+        off
+      default: false
+      selector:
+        boolean: {}
+    no_motion_blocker:
+      name: No Motion Blocker (Optional)
+      description: No motion sequence is not run if this boolean is in desired state
+        (see next input)
+      default:
+      selector:
+        entity: {}
+    no_motion_blocker_boolean:
+      name: No Motion Chooser (Optional)
+      description: Desired state of no motion blocker.
+        off
+      default: false
+      selector:
+        boolean: {}
+    light_sensor:
+      name: Light Level Sensor (Optional)
+      default:
+      selector:
+        entity:
+          device_class: illuminance
+    light_level:
+      name: Maximum light level (Optional)
+      description: Light level below which to turn on the lights.
+      default:
+      selector:
+        number:
+          min: 0
+          max: 600
+          step: 1
+          unit_of_measurement: lx
+    scene_morning:
+      name: Scene for the morning (Optional)
+      default: scene.none
+      selector:
+        entity:
+          domain: scene
+    scene_day:
+      name: Scene for the bright day (Optional)
+      default: scene.none
+      selector:
+        entity:
+          domain: scene
+    scene_evening:
+      name: Scene for the evening (Optional)
+      default: scene.none
+      selector:
+        entity:
+          domain: scene
+    scene_night:
+      name: Scene for the night (Optional)
+      default: scene.none
+      selector:
+        entity:
+          domain: scene
+    elevation_scene_morning:
+      name: Morning scene elevation limit
+      description: The maximum sun elevation to activate the morning scene.
+      default: none
+      selector:
+        number:
+          min: -90.0
+          max: 90.0
+          unit_of_measurement: degrees
+          mode: slider
+          step: 1.0
+    elevation_scene_evening:
+      name: Evening scene elevation limit
+      description: The maximum sun elevation to activate the evening scene.
+      default: none
+      selector:
+        number:
+          min: -90.0
+          max: 90.0
+          unit_of_measurement: degrees
+          mode: slider
+          step: 1.0
+    night_state_boolean:
+      name: Night state toggle
+      description: Night mode is activated when this item is true.
+      default:
+      selector:
+        entity: {}
+mode: restart
+max_exceeded: silent
+variables:
+  scene_morning: !input 'scene_morning'
+  scene_day: !input 'scene_day'
+  scene_evening: !input 'scene_evening'
+  scene_night: !input 'scene_night'
+  elevation_scene_morning: !input 'elevation_scene_morning'
+  elevation_scene_evening: !input 'elevation_scene_evening'
+  night_state_boolean: !input 'night_state_boolean'
+  automation_blocker: !input 'automation_blocker'
+  automation_blocker_boolean: !input 'automation_blocker_boolean'
+  no_motion_blocker: !input 'no_motion_blocker'
+  no_motion_blocker_boolean: !input 'no_motion_blocker_boolean'
+  motion_entity: !input 'motion_entity'
+  light_sensor: !input 'light_sensor'
+  light_level: !input 'light_level'
+trigger:
+- platform: state
+  entity_id: !input 'motion_entity'
+  from: 'off'
+  to: 'on'
+- platform: state
+  entity_id: !input 'motion_entity'
+  from: 'on'
+  to: 'off'
+  for: !input 'no_motion_wait'
+condition:
+- condition: or
+  conditions:
+    - '{{ automation_blocker == none }}'
+    - '{{ automation_blocker_boolean and states[automation_blocker].state == ''on'' }}'
+    - '{{ not automation_blocker_boolean and states[automation_blocker].state == ''off'' }}'
+action:
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.to_state.state == ''on'' }}'
+    sequence:
+    - condition: or
+      conditions:
+        - '{{ light_sensor == none }}'
+        - '{{ light_level == none }}'
+        - condition: numeric_state
+          entity_id: !input 'light_sensor'
+          below: !input 'light_level'
+    - choose:
+    # Night
+      - conditions:
+        - '{{ scene_night != ''scene.none''}}'
+        - '{{ night_state_boolean != none }}'
+        - '{{ states[night_state_boolean].state == ''on'' }}'
+        sequence:
+          - scene: !input 'scene_night'
+          
+    # Morning
+      - conditions:
+        - '{{ scene_morning != ''scene.none''}}'
+        - condition: state
+          entity_id: sun.sun
+          attribute: rising
+          state: true
+        - condition: numeric_state
+          entity_id: sun.sun
+          attribute: elevation
+          below: !input 'elevation_scene_morning'
+        sequence:
+        - scene: !input 'scene_morning'
+        
+    # Evening
+      - conditions:
+        - '{{ scene_evening != ''scene.none''}}'
+        - condition: state
+          entity_id: sun.sun
+          attribute: rising
+          state: false
+        - condition: numeric_state
+          entity_id: sun.sun
+          attribute: elevation
+          below: !input 'elevation_scene_evening'
+        sequence:
+        - scene: !input 'scene_evening'
+        
+    # Day
+      - conditions:
+        - '{{ scene_day != ''scene.none''}}'
+        sequence:
+        - scene: !input 'scene_day'
+      default:
+      - service: light.turn_on
+        target: !input 'light_target'
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.to_state.state == ''off'' }}'
+    sequence:
+    - service: light.turn_off
+      target: !input 'light_target'

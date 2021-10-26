@@ -1,0 +1,165 @@
+blueprint:
+  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/philips_dimmer.yaml
+  name: "Philips Hue Dimmer Switch - Custom Actions"
+  description: Freely customizable actions for Philips Hue Dimmer Switch buttons.
+  domain: automation
+  input:
+    remote:
+      name: Dimmer Switch
+      selector:
+        device:
+          integration: hue
+    light:
+      name: Lights
+      selector:
+        entity:
+          domain: light
+    circadean_light_switch:
+      name: Circadean light switch
+      selector:
+        entity:
+          domain: switch
+    automatic_light_boolean:
+      name: Automatic light boolean
+      selector:
+        entity:
+          domain: input_boolean
+
+mode: queued
+max_exceeded: silent
+
+trigger:
+  - platform: device
+    device_id: !input remote
+    domain: hue
+    type: remote_button_long_release
+    subtype: turn_on
+    id: long_on
+  - platform: device
+    device_id: !input remote
+    domain: hue
+    type: remote_button_long_release
+    subtype: turn_off
+    id: long_off
+  - platform: device
+    device_id: !input remote
+    domain: hue
+    type: remote_button_short_release
+    subtype: turn_on
+    id: short_on
+  - platform: device
+    device_id: !input remote
+    domain: hue
+    type: remote_button_short_release
+    subtype: turn_off
+    id: short_off
+  - platform: device
+    device_id: !input remote
+    domain: hue
+    type: remote_button_short_release
+    subtype: dim_up
+    id: short_up
+  - platform: device
+    device_id: !input remote
+    domain: hue
+    type: remote_button_short_release
+    subtype: dim_down
+    id: short_down
+  - platform: device
+    device_id: !input remote
+    domain: hue
+    type: remote_button_long_release
+    subtype: dim_up
+    id: long_up
+  - platform: device
+    device_id: !input remote
+    domain: hue
+    type: remote_button_long_release
+    subtype: dim_down
+    id: long_down
+
+action:
+  - choose:
+      - conditions:
+        - condition: trigger
+          id: long_on
+        sequence: 
+          - service: input_boolean.turn_on
+            target: 
+              entity_id: !input automatic_light_boolean
+          - service: switch.turn_off
+            target: 
+              entity_id: !input circadean_light_switch
+          - service: switch.turn_on
+            target: 
+              entity_id: !input circadean_light_switch
+      - conditions:
+        - condition: trigger
+          id: long_off
+        sequence: 
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input automatic_light_boolean
+          - service: switch.turn_off
+            target:
+              entity_id: !input circadean_light_switch
+      - conditions:
+        - condition: trigger
+          id: short_on
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input light
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input automatic_light_boolean
+      - conditions:
+        - condition: trigger
+          id: short_off
+        sequence:
+          - service: light.turn_off
+            target:
+              entity_id: !input light
+          - service: input_boolean.turn_off
+            target:
+              entity_id: !input automatic_light_boolean
+      - conditions:
+        - condition: trigger
+          id: short_down
+        - condition: numeric_state
+          entity_id: !input light
+          attribute: brightness
+          above: 27
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input light
+            data:
+              brightness_step_pct: -10
+      - conditions:
+        - condition: trigger
+          id: short_up
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input light
+            data:
+              brightness_step_pct: 10
+      - conditions:
+        - condition: trigger
+          id: long_up
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input light
+            data:
+              brightness_pct: 100
+      - conditions:
+        - condition: trigger
+          id: long_down
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input light
+            data:
+              brightness_pct: 1

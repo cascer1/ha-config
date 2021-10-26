@@ -7,24 +7,21 @@ night_time:
 house_occupied:
   name: House is occupied
   icon: fapro:house-return
-office_light_automatic_on:
-  name: Office light automatic on
-office_light_automatic_off:
-  name: Office light automatic off
-side_kitchen_light_automatic_on:
-  name: Side kitchen light automatic on
-side_kitchen_light_automatic_off:
-  name: Side kitchen light automatic off
-living_room_light_automatic_on:
-  name: Living room light automatic on
-living_room_light_automatic_off:
-  name: Living room light automatic off
-powercalc_google_asssitant_devices:
-  name: Powercalc Google Assistant devices
-  initial: true
-powercalc_network_devices:
-  name: Powercalc networking devices
-  initial: true
+office_automatic_lights:
+  name: Office light automatic control
+  icon: mdi:walk
+scullery_automatic_lights:
+  name: Scullery light automatic control
+  icon: mdi:walk
+living_room_automatic_lights:
+  name: Living room light automatic control
+  icon: mdi:walk
+hallway_upstairs_automatic_lights:
+  name: Hallway upstairs light automatic control
+  icon: mdi:walk
+hallway_downstairs_automatic_lights:
+  name: Hallway downstairs light automatic control
+  icon: mdi:walk
 powercalc_nas:
   name: Powercalc nas
   initial: true

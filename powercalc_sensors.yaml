@@ -2,24 +2,24 @@
   entity_id: light.bedroom_ceiling_1
   manufacturer: signify
   model: LCT015
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
   entity_id: light.bedroom_ceiling_2
   manufacturer: signify
   model: LCT015
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
   entity_id: light.dining_table_down
   linear:
     min_power: 2
     max_power: 19.5
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
   entity_id: light.dining_table_up
   linear:
     min_power: 2
     max_power: 19.5
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
   entity_id: light.kitchen_cabinets
   linear:
@@ -29,31 +29,31 @@
       - 128 -> 4.1
       - 196 -> 8.4
       - 254 -> 17.6
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
   entity_id: light.kitchen_ceiling
   linear:
     min_power: 5
     max_power: 46.5
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
   entity_id: light.living_room_ceiling
   manufacturer: signify
   model: LCT015
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
   entity_id: light.living_room_corner
   manufacturer: signify
   model: LCT015
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
   entity_id: light.office_ceiling
   linear:
     min_power: 2
     max_power: 39
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
-  entity_id: light.side_kitchen_cabinets
+  entity_id: light.scullery_cabinets
   linear:
     calibrate:
       - 1 -> 1.3
@@ -61,30 +61,22 @@
       - 128 -> 4.9
       - 196 -> 10.1
       - 254 -> 21.4
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
-  entity_id: light.side_kitchen_ceiling_1
+  entity_id: light.scullery_spot_1
   manufacturer: signify
   model: LCT015
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
-  entity_id: light.side_kitchen_ceiling_2
+  entity_id: light.scullery_spot_2
   manufacturer: signify
   model: LCT015
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
-  entity_id: light.side_kitchen_window
+  entity_id: light.scullery_window
   manufacturer: signify
   model: LCT015
-  standby_usage: 0.2
-- platform: powercalc
-  entity_id: input_boolean.powercalc_google_asssitant_devices
-  fixed: 
-    power: 5.7
-- platform: powercalc
-  entity_id: input_boolean.powercalc_network_devices
-  fixed: 
-    power: 18
+  standby_power: 0.2
 - platform: powercalc
   entity_id: media_player.living_room_sonos
   fixed:
@@ -100,14 +92,36 @@
   entity_id: light.upstairs_hallway_spot_stairs
   manufacturer: signify
   model: LCT015
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
   entity_id: light.upstairs_hallway_spot_wall
   manufacturer: signify
   model: LCT015
-  standby_usage: 0.2
+  standby_power: 0.2
 - platform: powercalc
   entity_id: light.upstairs_hallway_ceiling
   linear:
     min_power: 1.5
     max_power: 8
+  standby_power: 0.2
+- platform: powercalc
+  entity_id: light.downstairs_hallway_spot_1
+  manufacturer: signify
+  model: LCT015
+  standby_power: 0.2
+- platform: powercalc
+  entity_id: light.downstairs_hallway_spot_2
+  manufacturer: signify
+  model: LCT015
+  standby_power: 0.2
+- platform: powercalc
+  entity_id: light.downstairs_hallway_spot_3
+  manufacturer: signify
+  model: LCT015
+  standby_power: 0.2
+- platform: powercalc
+  entity_id: light.downstairs_hallway_ceiling
+  linear:
+    min_power: 1.5
+    max_power: 10
+  standby_power: 0.2

@@ -36,7 +36,9 @@
     for: 00:05:00
     to: 'off'
   action:
-  - service: script.lights_not_home
+  - service: light.turn_off
+    target:
+      entity_id: light.everywhere
   - service: script.thermostat_away
   - service: media_player.media_pause
     target:
@@ -263,7 +265,8 @@
     entity_id:
     - switch.adaptive_lighting_sleep_mode_bedroom
     - switch.adaptive_lighting_sleep_mode_downstairs
-    - switch.adaptive_lighting_sleep_mode_hallway
+    - switch.adaptive_lighting_sleep_mode_hallway_upstairs
+    - switch.adaptive_lighting_sleep_mode_hallway_downstairs
   variables:
     sleep_mode: '{{ states(''input_boolean.night_time'') }}'
   mode: single
@@ -310,10 +313,7 @@
     entity_id: light.downstairs
     from: 'on'
     to: 'off'
-  condition:
-  - condition: time
-    after: input_datetime.evening_time
-    before: input_datetime.morning_time
+  condition: []
   action:
   - service: light.turn_off
     target:
@@ -329,7 +329,7 @@
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_bedroom
       lights:
-        entity_id: light.bedroom_lights_zha_group_0x0003
+        entity_id: light.bedroom
 - id: '1625646540727'
   alias: Light switch office
   description: ''
@@ -339,8 +339,7 @@
       remote: 0c4da719bcb63f5906a981887107b46c
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_office
-      automatic_on_boolean: input_boolean.office_light_automatic_on
-      automatic_off_boolean: input_boolean.office_light_automatic_off
+      automatic_control_boolean: input_boolean.office_automatic_lights
       lights:
         entity_id: light.office_ceiling
 - id: '1625655627109'
@@ -350,13 +349,11 @@
     path: cascer1/zha_philips_dimmer_adaptive_lights_manual.yaml
     input:
       remote: 725f1bc736179cea1cbacc1246b50efc
-      lights:
-        entity_id:
-        - light.side_kitchen_lights_zha_group_0x0002
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_side_kitchen
-      automatic_on_boolean: input_boolean.side_kitchen_light_automatic_on
-      automatic_off_boolean: input_boolean.side_kitchen_light_automatic_off
+      automatic_control_boolean: input_boolean.scullery_automatic_lights
+      lights:
+        entity_id: light.scullery
 - id: '1625655673754'
   alias: light switch kitchen
   description: ''
@@ -366,10 +363,9 @@
       remote: 2498812930e32477ec650a77852af040
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_downstairs
+      automatic_control_boolean: input_boolean.living_room_automatic_lights
       lights:
-        entity_id: light.kitchen_lights_zha_group_0x0005
-      automatic_on_boolean: input_boolean.living_room_light_automatic_on
-      automatic_off_boolean: input_boolean.living_room_light_automatic_off
+        entity_id: light.kitchen
 - id: '1625655734660'
   alias: light switch living room
   description: ''
@@ -379,13 +375,9 @@
       remote: 61dafb48861c8abf564ec83f1ce11449
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_downstairs
-      automatic_off_boolean: input_boolean.living_room_light_automatic_off
-      automatic_on_boolean: input_boolean.living_room_light_automatic_on
+      automatic_control_boolean: input_boolean.living_room_automatic_lights
       lights:
-        entity_id:
-        - light.tv_zha_group_0x0009
-        - light.kitchen_lights_zha_group_0x0005
-        - light.dining_table_zha_group_0x0007
+        entity_id: light.living_room
 - id: '1625656128887'
   alias: light switch bedroom wall
   description: ''
@@ -396,7 +388,7 @@
       brightness_step: 10
       adaptive_switch: switch.adaptive_lighting_bedroom
       lights:
-        entity_id: light.bedroom_lights_zha_group_0x0003
+        entity_id: light.bedroom
 - id: '1625663312335'
   alias: Wake up lights bedroom
   description: ''
@@ -414,11 +406,17 @@
   - service: input_boolean.turn_off
     target:
       entity_id: input_boolean.woken_up
-  - service: scene.turn_on
-    target:
-      entity_id: scene.morning_lights
+  - service: hue.hue_activate_scene
     data:
-      transition: 300
+      group_name: Bedroom
+      scene_name: Frosty dawn
+      transition: 3000
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.night_time
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.living_room_automatic_lights
   mode: single
 - id: '1626004480351'
   alias: Tradfri remote
@@ -434,25 +432,25 @@
         target:
           entity_id: light.downstairs_lights_zha_group_0x0004
       dimdown_short_double:
-      - service: script.flash_light
+      - service: light.turn_on
+        target:
+          entity_id: light.living_room
         data:
-          flash_mode: short
-          light_entity:
-            entity_id: light.downstairs_lights_zha_group_0x0004
-          adaptive_light_entity:
-            entity_id: switch.adaptive_lighting_downstairs
+          flash: short
       dimup_short_double:
-      - service: script.flash_light
+      - service: light.turn_on
+        target:
+          entity_id: light.office_ceiling
         data:
-          flash_mode: short
-          light_entity:
-            entity_id: light.office_ceiling
-          adaptive_light_entity:
-            entity_id: switch.adaptive_lighting_office
+          flash: short
       power_short:
       - service: media_player.media_play_pause
         target:
           entity_id: media_player.living_room_sonos
+      colorup_short:
+      - service: light.toggle
+        target:
+          entity_id: light.garden
 - id: '1626167291086'
   alias: Next alarm time changed
   description: ''
@@ -487,12 +485,13 @@
       no_motion_wait: 1800
       light_sensor: sensor.living_room_illuminance
       motion_entity: group.living_room_motion
-      power_on_boolean: input_boolean.living_room_light_automatic_on
-      power_off_boolean: input_boolean.living_room_light_automatic_off
+      automatic_control_boolean: input_boolean.living_room_automatic_lights
       light_target:
         entity_id:
-        - light.tv_zha_group_0x0009
-        - light.dining_table_zha_group_0x0007
+        - light.living_room_ceiling
+        - light.living_room_corner
+        - light.dining_table_down
+        - light.dining_table_up
 - id: '1626362518806'
   alias: motion while away
   description: ''
@@ -523,7 +522,7 @@
       message: motion detected while nobody was home
   mode: single
 - id: '1626441573303'
-  alias: Motion side kitchen
+  alias: Motion scullery
   description: ''
   use_blueprint:
     path: cascer1/motion_light_illuminance_manual.yaml
@@ -531,11 +530,10 @@
       motion_entity: binary_sensor.motion_d_activity
       light_sensor: sensor.motion_d_illuminance
       no_motion_wait: 90
-      light_target:
-        entity_id: light.side_kitchen_lights_zha_group_0x0002
-      power_on_boolean: input_boolean.side_kitchen_light_automatic_on
-      power_off_boolean: input_boolean.side_kitchen_light_automatic_off
+      automatic_control_boolean: input_boolean.scullery_automatic_lights
       light_level: 300
+      light_target:
+        entity_id: light.scullery
 - id: '1627379539423'
   alias: motion office
   description: ''
@@ -548,8 +546,7 @@
         entity_id: light.office_ceiling
       light_level: 200
       no_motion_wait: 1800
-      power_on_boolean: input_boolean.office_light_automatic_on
-      power_off_boolean: input_boolean.office_light_automatic_off
+      automatic_control_boolean: input_boolean.office_automatic_lights
 - id: '1627391476634'
   alias: Reset living automatic control
   description: ''
@@ -557,8 +554,7 @@
     path: cascer1/reset_automatic_control.yaml
     input:
       motion_sensor: group.living_room_motion
-      automatic_on_boolean: input_boolean.living_room_light_automatic_on
-      automatic_off_boolean: input_boolean.living_room_light_automatic_off
+      automatic_control_boolean: input_boolean.living_room_automatic_lights
 - id: '1627391516741'
   alias: Reset office automatic control
   description: ''
@@ -566,17 +562,15 @@
     path: cascer1/reset_automatic_control.yaml
     input:
       motion_sensor: binary_sensor.motion_c_activity
-      automatic_on_boolean: input_boolean.office_light_automatic_on
-      automatic_off_boolean: input_boolean.office_light_automatic_off
+      automatic_control_boolean: input_boolean.office_automatic_lights
 - id: '1627391800496'
-  alias: Reset side kitchen automatic control
+  alias: Reset scullery automatic control
   description: ''
   use_blueprint:
     path: cascer1/reset_automatic_control.yaml
     input:
       motion_sensor: binary_sensor.motion_d_activity
-      automatic_on_boolean: input_boolean.side_kitchen_light_automatic_on
-      automatic_off_boolean: input_boolean.side_kitchen_light_automatic_off
+      automatic_control_boolean: input_boolean.scullery_automatic_lights
 - id: '1627455358038'
   alias: Sonos off when living room is empty
   description: ''
@@ -606,55 +600,6 @@
       title: Motion in scullery
       message: motion in scullery
   mode: single
-- id: '1628666368372'
-  alias: Maximum temperature when away
-  description: Ensure temperature range while nobody is home
-  trigger:
-  - platform: numeric_state
-    entity_id: sensor.temp_b_temperature
-    above: '35'
-    for: 01:00:00
-  - platform: numeric_state
-    entity_id: sensor.temp_c_temperature
-    above: '35'
-    for: 01:00:00
-  - platform: numeric_state
-    entity_id: sensor.tstat_8d728f_current_temperature
-    above: '35'
-    for: 01:00:00
-  condition:
-  - condition: state
-    entity_id: input_boolean.house_occupied
-    state: 'off'
-  action:
-  - service: climate.turn_on
-    target:
-      entity_id:
-      - climate.bedroom
-      - climate.living_room
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 10
-      milliseconds: 0
-  - service: climate.set_hvac_mode
-    target:
-      entity_id:
-      - climate.living_room
-      - climate.bedroom
-    data:
-      hvac_mode: cool
-  - delay:
-      hours: 0
-      minutes: 30
-      seconds: 0
-      milliseconds: 0
-  - service: climate.turn_off
-    target:
-      entity_id:
-      - climate.bedroom
-      - climate.living_room
-  mode: single
 - id: '1628782433508'
   alias: motion kitchen
   description: ''
@@ -662,13 +607,12 @@
     path: cascer1/motion_light_illuminance_manual.yaml
     input:
       no_motion_wait: 1800
-      power_on_boolean: input_boolean.living_room_light_automatic_on
-      power_off_boolean: input_boolean.living_room_light_automatic_off
+      automatic_control_boolean: input_boolean.living_room_automatic_lights
       motion_entity: binary_sensor.motion_a_activity
-      light_target:
-        entity_id: light.kitchen_lights_zha_group_0x0005
       light_sensor: sensor.motion_a_illuminance
       light_level: 400
+      light_target:
+        entity_id: light.kitchen
 - id: '1629107975223'
   alias: Toggle heating system
   description: ''
@@ -683,16 +627,13 @@
         entity_id: binary_sensor.heating_required
         state: 'on'
       sequence:
-      - service: climate.set_temperature
+      - service: script.turn_on
         target:
-          entity_id: climate.tstat_8d728f
-        data:
-          temperature: 25
-          hvac_mode: heat
+          entity_id: script.boiler_heating
     default:
-    - service: climate.turn_off
+    - service: switch.turn_off
       target:
-        entity_id: climate.tstat_8d728f
+        entity_id: switch.shelly1_boiler
   mode: single
 - id: '1629270475151'
   alias: Notify motion downstairs
@@ -720,13 +661,282 @@
     path: cascer1/motion_light_sleep_illuminance.yaml
     input:
       motion_entity: binary_sensor.motion_e_activity
-      light_target:
-        entity_id: light.hallway_upstairs_zha_group_0x000c
       sleep_light_target:
         entity_id:
-        - light.upstairs_hallway_ceiling
         - light.upstairs_hallway_spot_stairs
-      no_motion_wait: 30
       light_sensor: sensor.motion_e_illuminance
-      light_level: 100
+      light_level: 30
       sleep_mode_switch: switch.adaptive_lighting_sleep_mode_hallway_upstairs
+      automatic_control_boolean: input_boolean.hallway_upstairs_automatic_lights
+      no_motion_wait: 60
+      light_target:
+        entity_id: light.upstairs_hallway
+- id: '1629910098639'
+  alias: Motion hallway downstairs
+  description: ''
+  use_blueprint:
+    path: cascer1/motion_light_sleep_illuminance.yaml
+    input:
+      motion_entity: binary_sensor.motion_f_activity
+      light_sensor: sensor.motion_f_illuminance
+      sleep_mode_switch: switch.adaptive_lighting_sleep_mode_hallway_downstairs
+      automatic_control_boolean: input_boolean.hallway_downstairs_automatic_lights
+      light_level: 60
+      sleep_light_target:
+        entity_id:
+        - light.downstairs_hallway_spot_1
+        - light.downstairs_hallway_spot_2
+      light_target:
+        entity_id: light.downstairs_hallway
+      no_motion_wait: 60
+- id: '1630261299843'
+  alias: Disable automatic lights for Roomba
+  description: ''
+  trigger:
+  - platform: time
+    at: 01:55
+  condition: []
+  action:
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.living_room_automatic_lights
+  mode: single
+- id: '1633324619410'
+  alias: toggle outside lights
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    below: '1'
+  - platform: state
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+    entity_id: light.living_room
+  condition:
+  - condition: state
+    entity_id: light.living_room
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    below: '1'
+  - condition: state
+    entity_id: input_boolean.night_time
+    state: 'off'
+  action:
+  - service: light.turn_on
+    target:
+      entity_id: light.garden
+  mode: single
+- id: '1633325316903'
+  alias: sun rising
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    above: '1'
+  condition: []
+  action:
+  - service: light.turn_off
+    target:
+      entity_id: light.garden
+  mode: single
+- id: '1634540932364'
+  alias: Light switch office new
+  description: ''
+  trigger:
+  - device_id: 63b7794afb5fdc2416fceb9612481344
+    domain: hue
+    platform: device
+    type: remote_button_long_release
+    subtype: turn_on
+    id: long_on
+  - device_id: 63b7794afb5fdc2416fceb9612481344
+    domain: hue
+    platform: device
+    type: remote_button_long_release
+    subtype: turn_off
+    id: long_off
+  - device_id: 63b7794afb5fdc2416fceb9612481344
+    domain: hue
+    platform: device
+    type: remote_button_short_release
+    subtype: turn_on
+    id: short_on
+  - device_id: 63b7794afb5fdc2416fceb9612481344
+    domain: hue
+    platform: device
+    type: remote_button_short_release
+    subtype: turn_off
+    id: short_off
+  - device_id: 63b7794afb5fdc2416fceb9612481344
+    domain: hue
+    platform: device
+    type: remote_button_short_release
+    subtype: dim_up
+    id: short_up
+  - device_id: 63b7794afb5fdc2416fceb9612481344
+    domain: hue
+    platform: device
+    type: remote_button_short_release
+    subtype: dim_down
+    id: short_down
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: long_on
+      sequence:
+      - service: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.office_automatic_lights
+      - service: switch.turn_on
+        target:
+          entity_id: switch.adaptive_lighting_office
+    - conditions:
+      - condition: trigger
+        id: long_off
+      sequence:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.office_automatic_lights
+      - service: switch.turn_off
+        target:
+          entity_id: switch.adaptive_lighting_office
+    - conditions:
+      - condition: trigger
+        id: short_on
+      sequence:
+      - type: turn_on
+        device_id: fc2a86e47b35a06a62f296f0ddb199a5
+        entity_id: light.office_ceiling
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: short_off
+      sequence:
+      - type: turn_off
+        device_id: fc2a86e47b35a06a62f296f0ddb199a5
+        entity_id: light.office_ceiling
+        domain: light
+    - conditions:
+      - condition: trigger
+        id: short_up
+      sequence:
+      - device_id: fc2a86e47b35a06a62f296f0ddb199a5
+        domain: light
+        entity_id: light.office_ceiling
+        type: brightness_increase
+    - conditions:
+      - condition: trigger
+        id: short_down
+      sequence:
+      - type: toggle
+        device_id: 1234
+        entity_id: light.upstairs
+        domain: light
+    default: []
+  mode: single
+- id: '1634548101714'
+  alias: new office light switch
+  description: ''
+  use_blueprint:
+    path: cascer1/philips_dimmer.yaml
+    input:
+      remote: 63b7794afb5fdc2416fceb9612481344
+      light: light.office
+      circadean_light_switch: switch.adaptive_lighting_office
+      automatic_light_boolean: input_boolean.office_automatic_lights
+- id: '1634633811557'
+  alias: new motion lights living room
+  description: ''
+  use_blueprint:
+    path: cascer1/motion_light_hue_scenes.yaml
+    input:
+      motion_entity: group.living_room_motion
+      light_target:
+        entity_id:
+        - light.dining_table_down
+        - light.living_room_ceiling
+        - light.dining_table_up
+        - light.kitchen_ceiling
+        - light.living_room_corner
+        - light.kitchen_cabinets
+        - light.signe_gradient_table_1
+      no_motion_wait: 1800
+      automation_blocker: input_boolean.living_room_automatic_lights
+      no_motion_blocker: input_boolean.living_room_automatic_lights
+      automation_blocker_boolean: true
+      no_motion_blocker_boolean: true
+      light_sensor: sensor.living_room_illuminance
+      light_level: 250
+      room_name: Living room
+      scene_morning: morning
+      scene_day: day
+      scene_evening: evening
+      scene_night: night
+      elevation_scene_morning: 3
+      elevation_scene_evening: 3
+      night_state_boolean: input_boolean.night_time
+- id: '1634634953446'
+  alias: new motion lights downstairs hallway
+  description: ''
+  use_blueprint:
+    path: cascer1/motion_light_hue_scenes.yaml
+    input:
+      motion_entity: binary_sensor.motion_f_activity
+      light_target:
+        entity_id:
+        - light.downstairs_hallway_spot_2
+        - light.downstairs_hallway_ceiling
+        - light.downstairs_hallway_spot_1
+        - light.downstairs_hallway_spot_3
+      no_motion_wait: 60
+      automation_blocker: input_boolean.hallway_downstairs_automatic_lights
+      no_motion_blocker: input_boolean.hallway_downstairs_automatic_lights
+      automation_blocker_boolean: true
+      no_motion_blocker_boolean: true
+      light_sensor: sensor.motion_f_illuminance
+      light_level: 100
+      room_name: Downstairs hallway
+      scene_morning: morning
+      scene_day: day
+      scene_evening: evening
+      scene_night: night
+      elevation_scene_morning: 5
+      elevation_scene_evening: 5
+      night_state_boolean: input_boolean.night_time
+- id: '1634635044994'
+  alias: new motion lights upstairs hallway
+  description: ''
+  use_blueprint:
+    path: cascer1/motion_light_hue_scenes.yaml
+    input:
+      motion_entity: binary_sensor.motion_e_activity
+      light_target:
+        entity_id:
+        - light.upstairs_hallway_ceiling
+        - light.upstairs_hallway_spot_wall
+        - light.upstairs_hallway_spot_stairs
+      no_motion_wait: 60
+      automation_blocker: input_boolean.hallway_upstairs_automatic_lights
+      no_motion_blocker: input_boolean.hallway_upstairs_automatic_lights
+      automation_blocker_boolean: true
+      no_motion_blocker_boolean: true
+      light_sensor: sensor.motion_e_illuminance
+      light_level: 60
+      room_name: Upstairs hallway
+      scene_morning: morning
+      scene_day: day
+      scene_evening: evening
+      scene_night: night
+      elevation_scene_morning: 5
+      elevation_scene_evening: 5
+      night_state_boolean: input_boolean.night_time

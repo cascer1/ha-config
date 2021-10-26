@@ -8,15 +8,9 @@ blueprint:
       name: Motion Sensor
       selector:
         entity:
-    automatic_on_boolean:
-      name: Automatic ON boolean
-      description: Input boolean to keep track of automatic control for turning on the lights
-      selector:
-        entity:
-          domain: input_boolean
-    automatic_off_boolean:
-      name: Automatic OFF boolean
-      description: Input boolean to keep track of automatic control for turning off the lights
+    automatic_control_boolean:
+      name: Automatic control boolean
+      description: Input boolean to keep track of automatic control for the lights
       selector:
         entity:
           domain: input_boolean
@@ -33,7 +27,4 @@ trigger:
 action:
   - service: input_boolean.turn_on
     target:
-      entity_id: !input automatic_on_boolean
-  - service: input_boolean.turn_on
-    target:
-      entity_id: !input automatic_off_boolean
+      entity_id: !input automatic_control_boolean

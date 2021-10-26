@@ -37,13 +37,19 @@ blueprint:
           device_class: illuminance
     light_level:
       name: Light Level
-      description: Light level gelow which to turn on the lights.
+      description: Light level below which to turn on the lights.
       selector:
         number:
           min: 0
           max: 500
           step: 10
           unit_of_measurement: lx
+    automatic_control_boolean:
+      name: Automatic control boolean
+      description: This toggle enables or disables automatic lights.
+      selector:
+        entity:
+          domain: input_boolean
     sleep_mode_switch:
       name: Sleep Mode Switch
       description: Switch that tracks sleep mode
@@ -61,6 +67,11 @@ trigger:
   entity_id: !input motion_entity
   from: "off"
   to: "on"
+
+condition:
+  - condition: state
+    entity_id: !input automatic_control_boolean
+    state: 'on'
 
 action:
   - choose:
@@ -90,8 +101,8 @@ action:
       from: "on"
       to: "off"
   - delay: !input no_motion_wait
-  - service: light.turn_off
-    target: !input light_target
-  - delay: 5
+  - condition: state
+    entity_id: !input automatic_control_boolean
+    state: 'on'
   - service: light.turn_off
     target: !input light_target

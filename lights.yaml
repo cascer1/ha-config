@@ -1,14 +1,21 @@
   - platform: group
     name: Upstairs
     entities:
-      - light.bedroom_lights_zha_group_0x0003
-      - light.hallway_upstairs_zha_group_0x000c
+      - light.bedroom
+      - light.upstairs_hallway
       - light.office_ceiling
+  - platform: group
+    name: Living
+    entities:
+      - light.living_room_corner
+      - light.living_room_ceiling
+      - light.dining_table
   - platform: group
     name: Downstairs
     entities:
-      - light.living_room_zha_group_0x0008
-      - light.kitchen_lights_zha_group_0x0005
+      - light.living
+      - light.kitchen
+      - light.downstairs_hallway
   - platform: group
     name: Inside
     entities:
@@ -17,7 +24,7 @@
   - platform: group
     name: Outside
     entities:
-      - light.side_kitchen_lights_zha_group_0x0002
+      - light.scullery
       - light.garden
   - platform: group
     name: Everywhere
@@ -25,3 +32,18 @@
       - light.upstairs
       - light.downstairs
       - light.outside
+  - platform: group
+    name: Kitchen
+    entities:
+      - light.kitchen_cabinets
+      - light.kitchen_ceiling
+  - platform: group
+    name: Dining table
+    entities:
+      - light.dining_table_up
+      - light.dining_table_down
+  - platform: group
+    name: TV
+    entities:
+      - light.living_room_corner
+      - light.living_room_ceiling

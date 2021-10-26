@@ -62,3 +62,6 @@
   duration:
     minutes: 5
   process_undef_as: 0
+- platform: derivative
+  source: sensor.temp_d_humidity
+  name: Bathroom humidity change

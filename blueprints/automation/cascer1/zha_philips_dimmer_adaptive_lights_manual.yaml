@@ -32,15 +32,9 @@ blueprint:
       selector:
         entity:
           domain: switch
-    automatic_on_boolean:
-      name: Automatic ON boolean
-      description: Input boolean to keep track of automatic control for turning on the lights
-      selector:
-        entity:
-          domain: input_boolean
-    automatic_off_boolean:
-      name: Automatic OFF boolean
-      description: Input boolean to keep track of automatic control for turning off the lights
+    automatic_control_boolean:
+      name: Automatic control boolean
+      description: Input boolean to keep track of automatic control of the lights
       selector:
         entity:
           domain: input_boolean
@@ -67,10 +61,7 @@ action:
             target: !input lights
           - service: input_boolean.turn_off
             target:
-              entity_id: !input automatic_off_boolean
-          - service: input_boolean.turn_on
-            target:
-              entity_id: !input automatic_on_boolean
+              entity_id: !input automatic_control_boolean
       - conditions:
         - '{{ command == "on_double_press" }}'
         sequence:
@@ -81,10 +72,7 @@ action:
               brightness_pct: 100
           - service: input_boolean.turn_off
             target:
-              entity_id: !input automatic_off_boolean
-          - service: input_boolean.turn_on
-            target:
-              entity_id: !input automatic_on_boolean
+              entity_id: !input automatic_control_boolean
       - conditions:
           - '{{ command == "on_hold" }}'
         sequence: 
@@ -97,10 +85,7 @@ action:
               manual_control: false
           - service: input_boolean.turn_on
             target:
-              entity_id: !input automatic_on_boolean
-          - service: input_boolean.turn_on
-            target:
-              entity_id: !input automatic_off_boolean
+              entity_id: !input automatic_control_boolean
       - conditions: >
           {{ command == 'up_short_release' or command == 'up_hold' }}  
         sequence:
@@ -138,10 +123,7 @@ action:
             target: !input lights
           - service: input_boolean.turn_off
             target:
-              entity_id: !input automatic_on_boolean
-          - service: input_boolean.turn_on
-            target:
-              entity_id: !input automatic_off_boolean
+              entity_id: !input automatic_control_boolean
       - conditions:
           - '{{ command == "off_hold" }}'
         sequence: 
@@ -150,8 +132,5 @@ action:
               entity_id: !input adaptive_switch
           - service: input_boolean.turn_off
             target:
-              entity_id: !input automatic_off_boolean
-          - service: input_boolean.turn_off
-            target:
-              entity_id: !input automatic_on_boolean
+              entity_id: !input automatic_control_boolean
 
