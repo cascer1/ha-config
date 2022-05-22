@@ -1,0 +1,59 @@
+blueprint:
+  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/zha_ikea_symfonisk_controller.yaml
+  name: ZHA - IKEA SYMFONISK - Sound Controller
+  description: This automation simulates the use of the IKEA SYMFONISK sound controller 
+    connected through ZHA.
+  domain: automation
+  input:
+    remote:
+      name: IKEA SYMFONISK remote control
+      description: Select the remote control you wish to use.
+      selector:
+        device:
+          integration: zha
+          manufacturer: IKEA of Sweden
+          model: SYMFONISK Sound Controller
+    press:
+      name: Press
+      description: The action to perform on Press of the Button
+      selector:
+        action: {}
+      default: []
+    clockwise:
+      name: Clockwise Rotation
+      description: The action to perform on Clockwise Rotation of the button
+      selector:
+        action: {}
+      default: []
+    counter_clockwise:
+      name: Counter Clockwise Rotation
+      description: The action to perform on Counter Clockwise Rotation of the button
+      selector:
+        action: {}
+      default: []
+mode: single
+max_exceeded: silent
+trigger:
+- platform: event
+  event_type: zha_event
+  event_data:
+    device_id: !input 'remote'
+action:
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == "toggle" }}'
+    sequence: !input 'press'
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == "move" }}'
+    - condition: template
+      value_template: '{{ trigger.event.data.args == [0,195,0,0] }}'
+    sequence: !input 'clockwise'
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.event.data.command == "move" }}'
+    - condition: template
+      value_template: '{{ trigger.event.data.args == [1,195,0,0] }}'
+    sequence: !input 'counter_clockwise'
+- delay: 0.5
