@@ -10,3 +10,8 @@ living_room_motion:
   entities:
     - binary_sensor.motion_a_activity
     - binary_sensor.motion_b_activity
+upstairs_motion:
+  name: Upstairs Motion
+  entities:
+    - binary_sensor.motion_c_activity
+    - binary_sensor.motion_e_activity

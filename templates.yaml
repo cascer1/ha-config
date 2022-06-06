@@ -1,7 +1,7 @@
 - sensor:
   - name: "Solar lifetime energy"
     unique_id: solar_lifetime_energy
-    state: "{{ (states('sensor.solaredge_lifetime_energy') | float ) / 1000 | round(3) }}"
+    state: "{{ (states('sensor.solaredge_lifetime_energy') | float(0) ) / 1000 | round(3) }}"
     unit_of_measurement: "kWh"
     state_class: measurement
   - name: "Energy Consumption (Total)"
@@ -28,64 +28,42 @@
     unique_id: energy_consumption_total_watt
     unit_of_measurement: "Wh"
     state_class: measurement
-    state: "{{ (states('sensor.energy_consumption_total_custom') | float) * 1000 | round(3) }}"
+    state: "{{ (states('sensor.energy_consumption_total_custom') | float(0) ) * 1000 | round(3) }}"
   - name: "Energy Production Total Watt"
     unique_id: energy_production_total_watt
     unit_of_measurement: "Wh"
     state_class: measurement
-    state: "{{ (states('sensor.energy_production_total_custom') | float) * 1000 | round(3) }}"
+    state: "{{ (states('sensor.energy_production_total_custom') | float(0) ) * 1000 | round(3) }}"
   - name: "Energy Consumption Total Daily"
     unique_id: energy_consumption_total_daily
     unit_of_measurement: "kWh"
     state_class: measurement
-    state: "{{ (states('sensor.energy_daily_high_meter') | float) + (states('sensor.energy_daily_low_meter') | float) }}"
+    state: "{{ (states('sensor.energy_daily_high_meter') | float(0) ) + (states('sensor.energy_daily_low_meter') | float(0) ) }}"
   - name: "Energy Production Total Daily"
     unique_id: energy_production_total_daily
     unit_of_measurement: "kWh"
     state_class: measurement
-    state: "{{ (states('sensor.energy_production_daily_high_meter') | float) + (states('sensor.energy_production_daily_low_meter') | float) }}"
+    state: "{{ (states('sensor.energy_production_daily_high_meter') | float(0) ) + (states('sensor.energy_production_daily_low_meter') | float(0) ) }}"
   - name: "Energy Consumption Total Monthly"
     unique_id: energy_consumption_total_monthly
     unit_of_measurement: "kWh"
     state_class: measurement
-    state: "{{ (states('sensor.energy_monthly_high_meter') | float) + (states('sensor.energy_monthly_low_meter') | float) }}"
+    state: "{{ (states('sensor.energy_monthly_high_meter') | float(0) ) + (states('sensor.energy_monthly_low_meter') | float(0) ) }}"
   - name: "Energy Production Total Monthly"
     unique_id: energy_production_total_monthly
     unit_of_measurement: "kWh"
     state_class: measurement
-    state: "{{ (states('sensor.energy_production_monthly_high_meter') | float) + (states('sensor.energy_production_monthly_low_meter') | float) }}"
-  - name: "Energy Usage Lights"
-    unique_id: energy_usage_lights
-    unit_of_measurement: "kWh"
-    device_class: energy
-    state_class: total_increasing
-    state: "{{  (
-( states('sensor.bedroom_ceiling_1_energy') | float ) +
-( states('sensor.bedroom_ceiling_2_energy') | float ) +
-( states('sensor.dining_table_down_energy') | float ) +
-( states('sensor.dining_table_up_energy') | float ) +
-( states('sensor.downstairs_hallway_ceiling_energy') | float ) +
-( states('sensor.downstairs_hallway_spot_1_energy') | float ) +
-( states('sensor.downstairs_hallway_spot_2_energy') | float ) +
-( states('sensor.downstairs_hallway_spot_3_energy') | float ) +
-( states('sensor.kitchen_cabinets_energy') | float ) +
-( states('sensor.kitchen_ceiling_energy') | float ) +
-( states('sensor.living_room_ceiling_energy') | float ) +
-( states('sensor.living_room_corner_energy') | float ) +
-( states('sensor.office_ceiling_energy') | float ) +
-( states('sensor.scullery_cabinets_energy') | float ) +
-( states('sensor.scullery_spot_1_energy') | float ) +
-( states('sensor.scullery_spot_2_energy') | float ) +
-( states('sensor.scullery_window_energy') | float ) +
-( states('sensor.upstairs_hallway_ceiling_energy') | float ) +
-( states('sensor.upstairs_hallway_spot_stairs_energy') | float ) +
-( states('sensor.upstairs_hallway_spot_wall_energy') | float )      
-) | round(3)
-}}"
+    state: "{{ (states('sensor.energy_production_monthly_high_meter') | float(0) ) + (states('sensor.energy_production_monthly_low_meter') | float(0) ) }}"
+  - name: "Electricity price offset"
+    unique_id: electricity_price_offset
+    unit_of_measurement: "€/kWh"
+    state: "{{ (states('sensor.current_electricity_price_all_in') | float(0) - states('sensor.average_electricity_price_today') | float(0) ) | round(2) }}"
   binary_sensor:
     - name: "Heating required"
       unique_id: heating_required
       state: "{{ states('input_boolean.office_heat') == 'on'
         or states('input_boolean.hallway_heat') == 'on'
         or states('input_boolean.bathroom_heat') == 'on' }}"
-
+    - name: "Cheap electricity"
+      unique_id: cheap_electricity
+      state: "{{ states('sensor.average_electricity_price_today') | float(0) > states('sensor.current_electricity_price_all_in') | float(0) }}"

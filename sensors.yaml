@@ -3,7 +3,7 @@
     power_consumption_total_net:
       friendly_name: 'Power Usage (Net)'
       unit_of_measurement: 'W'
-      value_template: "{{ states('sensor.power_consumption_watt')|float + (states('sensor.solaredge_current_power')|float | round(0)) - states('sensor.power_production_watt')|float }}"
+      value_template: "{{ states('sensor.power_consumption_watt')|float + (states('sensor.solaredge_ac_power')|float | round(0)) - states('sensor.power_production_watt')|float }}"
     power_flow_net:
       friendly_name: 'Power Flow'
       unit_of_measurement: 'W'
@@ -52,7 +52,7 @@
   entities:
     - sensor.shelly_plug_1_power
   duration:
-    minutes: 5
+    minutes: 30
   process_undef_as: 0
 - platform: average
   unique_id: average_power_plug_2
@@ -60,8 +60,35 @@
   entities:
     - sensor.shelly_plug_2_power
   duration:
-    minutes: 5
+    minutes: 30
   process_undef_as: 0
 - platform: derivative
   source: sensor.temp_d_humidity
   name: Bathroom humidity change
+- platform: frank_energie
+  display_options:
+    - gas_market
+    - gas_tax
+    - gas_markup
+    - elec_market
+    - elec_tax
+    - elec_markup
+    - gas_min
+    - gas_max
+    - elec_min
+    - elec_max
+    - elec_avg
+- platform: statistics
+  name: "Average Electricity Cost"
+  unique_id: average_electricity_cost
+  entity_id: sensor.current_electricity_price_all_in
+  state_characteristic: mean
+  max_age:
+    hours: 24
+- platform: statistics
+  name: "Average Gas Cost"
+  unique_id: average_gas_cost
+  entity_id: sensor.current_gas_price_all_in
+  state_characteristic: mean
+  max_age:
+    hours: 1

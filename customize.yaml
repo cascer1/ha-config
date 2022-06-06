@@ -15,8 +15,7 @@ sensor.solar_lifetime_energy:
 sensor.energy_usage_lights:
   device_class: energy
 sensor.shelly_plug_1_energy:
-  friendly_name: Computer Cas
-sensor.shelly_plug_2_energy:
-  friendly_name: Computer Bert
+  friendly_name: Verwarming bijkeuken
+sensor.shelly_plug_2_energy: {}
 sensor.living_room_illuminance:
   device_class: illuminance

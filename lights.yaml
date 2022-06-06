@@ -1,22 +1,4 @@
   - platform: group
-    name: Upstairs
-    entities:
-      - light.bedroom
-      - light.upstairs_hallway
-      - light.office_ceiling
-  - platform: group
-    name: Living
-    entities:
-      - light.living_room_corner
-      - light.living_room_ceiling
-      - light.dining_table
-  - platform: group
-    name: Downstairs
-    entities:
-      - light.living
-      - light.kitchen
-      - light.downstairs_hallway
-  - platform: group
     name: Inside
     entities:
       - light.downstairs
@@ -26,17 +8,13 @@
     entities:
       - light.scullery
       - light.garden
+      - light.garden_table
   - platform: group
     name: Everywhere
     entities:
       - light.upstairs
       - light.downstairs
       - light.outside
-  - platform: group
-    name: Kitchen
-    entities:
-      - light.kitchen_cabinets
-      - light.kitchen_ceiling
   - platform: group
     name: Dining table
     entities:

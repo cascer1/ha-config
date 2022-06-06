@@ -5,8 +5,8 @@
   min_temp: 14
   max_temp: 25
   min_cycle_duration:
-    seconds: 20
-  away_temp: 14
+    minutes: 5
+  away_temp: 15
   initial_hvac_mode: "heat"
   precision: 0.5
 - platform: generic_thermostat
@@ -17,18 +17,7 @@
   max_temp: 25
   min_cycle_duration:
     seconds: 20
-  away_temp: 14
-  initial_hvac_mode: "heat"
-  precision: 0.5
-- platform: generic_thermostat
-  name: Scullery
-  heater: input_boolean.scullery_heat
-  target_sensor: sensor.temp_a_temperature
-  min_temp: 10
-  max_temp: 25
-  min_cycle_duration:
-    seconds: 20
-  away_temp: 14
+  away_temp: 15
   initial_hvac_mode: "heat"
   precision: 0.5
 - platform: generic_thermostat

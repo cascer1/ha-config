@@ -13,9 +13,8 @@ thermostat_away:
     target:
       entity_id:
       - climate.office
-      - climate.hallway
       - climate.bathroom
-      - climate.scullery
+      - climate.hallway
     data:
       preset_mode: away
   - service: climate.set_temperature
@@ -33,48 +32,11 @@ thermostat_home:
     target:
       entity_id:
       - climate.bathroom
-      - climate.hallway
       - climate.office
-      - climate.scullery
+      - climate.hallway
     data:
       preset_mode: none
   - service: script.reload_climate_automations
-lights_not_home:
-  alias: Lights not home
-  description: Set the lights when leaving home, depending on daylight
-  icon: mdi:lamp
-  mode: single
-  sequence:
-  - service: light.turn_off
-    entity_id: light.everywhere
-  - condition: numeric_state
-    entity_id: sun.sun
-    attribute: elevation
-    below: input_number.sun_elevation_dark
-  - condition: time
-    after: '12:00:00'
-  - service: light.turn_off
-    target:
-      entity_id: light.everywhere
-  - service: light.turn_on
-    target:
-      entity_id:
-      - light.kitchen_cabinets
-      - light.living_room_corner
-lights_home:
-  alias: Lights home
-  description: Turn on the lights when returning home
-  icon: mdi:lamp
-  mode: single
-  sequence:
-  - service: light.turn_on
-    target:
-      entity_id:
-      - light.downstairs
-      - light.garden
-  - service: switch.turn_on
-    target:
-      entity_id: switch.adaptive_lighting_downstairs
 home_music:
   alias: Home Music
   sequence:
@@ -111,7 +73,9 @@ wake_up:
   alias: Wake Up
   icon: mdi:alarm
   sequence:
-  - service: script.morning_music
+  - service: script.turn_on
+    target:
+      entity_id: script.morning_music
   - service: input_boolean.turn_on
     entity_id: input_boolean.woken_up
   - service: switch.turn_on
@@ -119,7 +83,7 @@ wake_up:
       entity_id: switch.adaptive_lighting_bedroom
   - service: input_boolean.turn_on
     target:
-      entity_id: input_boolean.living_room_light_automatic_on
+      entity_id: input_boolean.living_room_automatic_lights
   mode: single
 morning_music:
   alias: Morning Music
@@ -154,17 +118,27 @@ doorbell:
       description: How many times to ring the bell
       example: 1
   sequence:
+  - service: light.turn_on
+    data:
+      flash: short
+    target:
+      entity_id: light.office_ceiling
+  - service: script.turn_on
+    data: {}
+    target:
+      entity_id: script.doorbell_light
   - service: sonos.snapshot
     data:
       entity_id: media_player.living_room_sonos
+  - service: media_player.media_pause
+    target:
+      entity_id: media_player.living_room_sonos
+    data: {}
   - service: media_player.volume_set
     target:
       entity_id: media_player.living_room_sonos
     data:
       volume_level: 0.25
-  - service: switch.turn_on
-    target:
-      entity_id: switch.shelly1_e8db84d3500b
   - service: media_player.play_media
     data:
       media_content_id: https://assistant.eliens.co/local/doorbell1.wav
@@ -189,13 +163,6 @@ doorbell:
       entity_id: media_player.living_room_sonos
     data:
       repeat: 'off'
-  - service: light.turn_on
-    target:
-      entity_id:
-      - light.office_ceiling
-      - light.scullery
-    data:
-      flash: short
   - delay:
       hours: 0
       minutes: 0
@@ -219,13 +186,10 @@ reload_climate_automations:
   sequence:
   - service: scheduler.run_action
     data:
-      entity_id: switch.schedule_heat_bathroom
+      entity_id: switch.schedule_living_room_heating_friday
   - service: scheduler.run_action
     data:
-      entity_id: switch.schedule_office_heating
-  - service: scheduler.run_action
-    data:
-      entity_id: switch.schedule_heat_hallway
+      entity_id: switch.schedule_living_room_heating_vacation
   - service: scheduler.run_action
     data:
       entity_id: switch.schedule_living_room_heating_weekend
@@ -234,7 +198,19 @@ reload_climate_automations:
       entity_id: switch.schedule_living_room_heating_workdays
   - service: scheduler.run_action
     data:
+      entity_id: switch.schedule_bathroom_heating_weekend
+  - service: scheduler.run_action
+    data:
+      entity_id: switch.schedule_bathroom_heating_workdays
+  - service: scheduler.run_action
+    data:
       entity_id: switch.schedule_office_heating_weekend
+  - service: scheduler.run_action
+    data:
+      entity_id: switch.schedule_office_heating_workdays
+  - service: scheduler.run_action
+    data:
+      entity_id: switch.schedule_office_heating_unoccupied
   - choose:
     - conditions:
       - condition: state
@@ -248,6 +224,7 @@ reload_climate_automations:
           - climate.office
           - climate.hallway
           - climate.bathroom
+        data: {}
     default: []
   mode: single
   icon: fapro:sync
@@ -257,10 +234,28 @@ thermostat_sleep:
   icon: mdi:thermostat
   mode: single
   sequence:
-  - service: climate.turn_off
-    target:
-      entity_id:
-      - climate.living_room
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_select.climate_mode
+        state: heat
+      sequence:
+      - service: climate.set_temperature
+        target:
+          entity_id:
+          - climate.bathroom
+          - climate.office
+        data:
+          temperature: 16
+    - conditions:
+      - condition: state
+        entity_id: input_select.climate_mode
+        state: cool
+      sequence:
+      - service: climate.turn_off
+        target:
+          entity_id: climate.living_room
+    default: []
 flash_light:
   alias: Flash Light
   mode: queued
@@ -366,8 +361,12 @@ determine_alarm_light_fade_time:
   sequence:
   - choose:
     - conditions:
-      - condition: template
-        value_template: '{{ casHome and casTime < bertTime and casTime > 0}}'
+      - condition: or
+        conditions:
+        - condition: template
+          value_template: '{{ casHome and casTime <= bertTime and casTime > 0}}'
+        - condition: template
+          value_template: '{{ casHome and bertTime == 0 and casTime > 0 }}'
       sequence:
       - service: input_datetime.set_datetime
         target:
@@ -432,6 +431,10 @@ turn_off_after_half_hour:
 boiler_heating:
   alias: Boiler heating
   sequence:
+  - service: script.turn_on
+    target:
+      entity_id: script.radiator_fan_office_on
+    data: {}
   - repeat:
       while:
       - condition: state
@@ -441,18 +444,85 @@ boiler_heating:
       - service: switch.turn_on
         target:
           entity_id: switch.shelly1_boiler
+        data: {}
       - wait_for_trigger:
         - platform: state
           entity_id: binary_sensor.heating_required
           to: 'off'
-        timeout: 00:03:00
+        timeout: 00:14:50
       - service: switch.turn_off
         target:
           entity_id: switch.shelly1_boiler
+        data: {}
       - delay:
           hours: 0
           minutes: 2
           seconds: 0
           milliseconds: 0
-  mode: single
+  - delay:
+      hours: 0
+      minutes: 3
+      seconds: 0
+      milliseconds: 0
+  - type: turn_off
+    device_id: adca78ce5ccc0f695957716cd0ef5726
+    entity_id: switch.tradfri_plug_d
+    domain: switch
+  mode: restart
   icon: mdi:fire
+'1637064927134':
+  alias: Start vacuum
+  sequence:
+  - condition: state
+    entity_id: vacuum.noo_noo
+    state: docked
+    for:
+      hours: 15
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+  - service: vacuum.start
+    target:
+      entity_id: vacuum.noo_noo
+  mode: single
+  icon: mdi:robot-vacuum
+radiator_fan_office_on:
+  alias: radiator fan office on
+  sequence:
+  - delay:
+      hours: 0
+      minutes: 7
+      seconds: 0
+      milliseconds: 0
+  - condition: state
+    entity_id: input_boolean.office_heat
+    state: 'on'
+  - type: turn_on
+    device_id: adca78ce5ccc0f695957716cd0ef5726
+    entity_id: switch.tradfri_plug_d
+    domain: switch
+  mode: restart
+doorbell_light:
+  alias: doorbell light
+  sequence:
+  - service: light.turn_on
+    data:
+      brightness: 92
+    target:
+      entity_id:
+      - light.wled
+  - service: select.select_option
+    data:
+      option: bell
+    target:
+      entity_id: select.wled_preset
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.wled
+  mode: single

@@ -30,13 +30,13 @@ tts:
 
 sonos:
   media_player:
-    hosts:
-      - !secret network_sonos_host
+    hosts: !secret network_sonos_hosts
     advertise_addr: !secret network_hass_host
 
 powercalc:
   scan_interval: 00:20:00
   create_energy_sensors: true
+  enable_autodiscovery: false
   power_sensor_naming: "{} Power"
   energy_sensor_naming: "{} Energy"
 
@@ -52,6 +52,13 @@ recorder:
       - sensor.solaredge_energy_this_year
       - sensor.solaredge_energy_today
       - sensor.solaredge_lifetime_energy
+      - sensor.solaredge_ac_power
+      - sensor.solaredge_ac_pf
+      - sensor.solaredge_ac_energy_kwh
+      - sensor.solaredge_ac_current
+      - sensor.solaredge_temp_sink
+      - sensor.solaredge_ac_frequency
+      - sensor.solaredge_ac_va
 
 history:
   exclude:
@@ -81,7 +88,6 @@ binary_sensor: !include binary_sensors.yaml
 light: !include lights.yaml
 sensor: !include sensors.yaml
 sensor powercalc: !include powercalc_sensors.yaml
-  #sensor energy: !include energy_sensors.yaml
 notify: !include notify.yaml
 utility_meter: !include utility_meter.yaml
 input_number: !include input_numbers.yaml

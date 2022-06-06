@@ -12,33 +12,30 @@
       aliases:
         - Office Lights
         - Office
-    light.bedroom_lights_zha_group_0x0003:
+    light.bedroom:
       name: Bedroom Lights
       aliases:
         - Bedroom Light
         - Bedroom
-    light.downstairs_lights_zha_group_0x0004:
+    light.living_room:
       name: Downstairs Lights
       aliases:
         - Downstairs Light
         - Downstairs
-    light.kitchen_lights_zha_group_0x0005:
+    light.kitchen:
       name: Kitchen Lights
       aliases:
         - Kitchen Light
         - Kitchen
-    light.dining_table_zha_group_0x0007:
-      name: Dining Table Lights
-      aliases:
-        - Table Lights
-        - Table Light
-        - Dining Lamp
-        - Dining Light
-    light.side_kitchen_lights_zha_group_0x0002:
-      name: Side Kitchen Lights
-      aliases:
-        - Shed Lights
+    light.scullery:
+      name: Scullery Lights
     climate.living_room:
       name: Living Room AC
     climate.bedroom:
       name: Bedroom AC
+    light.downstairs_hallway:
+      name: Downstairs Hallway
+    light.upstairs_hallway:
+      name: Upstairs Hallway
+    input_boolean.dashboard:
+      name: Dashboard

@@ -1,31 +1,7 @@
-away_temperature:
-  name: Away temperature
-  min: 10.0
-  max: 20.0
-  step: 0.5
-  unit_of_measurement: °C
-  mode: box
-  icon: mdi:temperature-celsius
-home_temperature:
-  name: Home temperature
-  min: 15.0
-  max: 25.0
-  step: 0.5
-  unit_of_measurement: °C
-  mode: box
-  icon: mdi:temperature-celsius
-sun_elevation_dark:
-  name: Darkness sun elevation
-  min: -90
-  max: 90
-  step: 0.1
-  unit_of_measurement: °
-  mode: box
-  icon: mdi:theme-light-dark
 home_music_volume_level:
   name: Home Music volume
   min: 0
   max: 1
-  step: 0.05
+  step: 0.01
   mode: slider
   icon: mdi:music

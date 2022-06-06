@@ -7,6 +7,9 @@ night_time:
 house_occupied:
   name: House is occupied
   icon: fapro:house-return
+vacation_mode:
+  name: Vacation mode
+  icon: fapro:island-tropical
 office_automatic_lights:
   name: Office light automatic control
   icon: mdi:walk
@@ -31,5 +34,9 @@ bathroom_heat:
   name: Bathroom heat required
 hallway_heat:
   name: Hallway heat required
-scullery_heat:
-  name: Scullery heat required
+office_occupied_recently:
+  name: Office occupied recently
+upstairs_occupied_recently:
+  name: Upstairs occupied recently
+dashboard:
+  name: Google Home Dashboard

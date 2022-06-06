@@ -29,3 +29,6 @@ blueprints/automation/*
 blueprints/script/*
 !blueprints/automation/cascer1/
 !blueprints/script/cascer1/
+
+# Misc
+*.bak
