@@ -6,3 +6,7 @@
   name: utilitymonthly
   filename: /mnt/logs/utility_monthly.csv
   timestamp: true
+- platform: file
+  name: utilityhourly
+  filename: /mnt/logs/utility_hourly.csv
+  timestamp: true

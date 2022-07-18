@@ -40,33 +40,65 @@ thermostat_home:
 home_music:
   alias: Home Music
   sequence:
-  - service: media_player.volume_set
-    entity_id: media_player.living_room_sonos
-    data:
-      volume_level: '{{ states(''input_number.home_music_volume_level'') }}'
-  - service: media_player.shuffle_set
-    data:
-      shuffle: true
-    entity_id: media_player.living_room_sonos
-  - service: media_player.repeat_set
-    data:
-      repeat: all
-    entity_id: media_player.living_room_sonos
   - choose:
     - conditions:
       - condition: state
         entity_id: person.cas_eliens
         state: home
       sequence:
-      - service: media_player.select_source
-        entity_id: media_player.living_room_sonos
+      - service: media_player.play_media
+        target:
+          entity_id: media_player.living_room_arc
         data:
-          source: '{{ states(''input_text.home_music_source_cas'') }}'
+          media_content_id: FV:2/19
+          media_content_type: favorite_item_id
+        metadata:
+          title: Living Room
+          thumbnail: https://mosaic.scdn.co/640/ab67616d0000b273583f1300f2b356b42dd231b4ab67616d0000b2738b62f896e8d3ca8dad7588e7ab67616d0000b273f1ea3305aa003425dda05882ab67616d0000b273f60070dce96a2c1b70cf6ff0
+          media_class: playlist
+          children_media_class:
+          navigateIds:
+          - {}
+          - media_content_type: favorites
+            media_content_id: ''
+          - media_content_type: favorites_folder
+            media_content_id: object.container.playlistContainer
     default:
-    - service: media_player.select_source
-      entity_id: media_player.living_room_sonos
+    - service: media_player.play_media
+      target:
+        entity_id: media_player.living_room_arc
       data:
-        source: '{{ states(''input_text.home_music_source_bert'') }}'
+        media_content_id: FV:2/19
+        media_content_type: favorite_item_id
+      metadata:
+        title: Living Room
+        thumbnail: https://mosaic.scdn.co/640/ab67616d0000b273583f1300f2b356b42dd231b4ab67616d0000b2738b62f896e8d3ca8dad7588e7ab67616d0000b273f1ea3305aa003425dda05882ab67616d0000b273f60070dce96a2c1b70cf6ff0
+        media_class: playlist
+        children_media_class:
+        navigateIds:
+        - {}
+        - media_content_type: favorites
+          media_content_id: ''
+        - media_content_type: favorites_folder
+          media_content_id: object.container.playlistContainer
+  - service: media_player.volume_set
+    entity_id: media_player.living_room_arc
+    data:
+      volume_level: '{{ states(''input_number.home_music_volume_level'') }}'
+  - service: media_player.shuffle_set
+    data:
+      shuffle: true
+    target:
+      entity_id: media_player.living_room_arc
+  - service: media_player.repeat_set
+    data:
+      repeat: all
+    target:
+      entity_id: media_player.living_room_arc
+  - service: media_player.media_next_track
+    data: {}
+    target:
+      entity_id: media_player.living_room_arc
   mode: single
   icon: mdi:music
 wake_up:
@@ -89,26 +121,42 @@ morning_music:
   alias: Morning Music
   icon: mdi:music
   sequence:
+  - service: media_player.play_media
+    target:
+      entity_id: media_player.living_room_arc
+    data:
+      media_content_id: FV:2/19
+      media_content_type: favorite_item_id
+    metadata:
+      title: Living Room
+      thumbnail: https://mosaic.scdn.co/640/ab67616d0000b273583f1300f2b356b42dd231b4ab67616d0000b2738b62f896e8d3ca8dad7588e7ab67616d0000b273f1ea3305aa003425dda05882ab67616d0000b273f60070dce96a2c1b70cf6ff0
+      media_class: playlist
+      children_media_class:
+      navigateIds:
+      - {}
+      - media_content_type: favorites
+        media_content_id: ''
+      - media_content_type: favorites_folder
+        media_content_id: object.container.playlistContainer
+  - service: media_player.volume_set
+    target:
+      entity_id: media_player.living_room_arc
+    data:
+      volume_level: '{{ states(''input_number.home_music_volume_level'') }}'
+  - service: media_player.repeat_set
+    data:
+      repeat: all
+    target:
+      entity_id: media_player.living_room_arc
   - service: media_player.shuffle_set
     data:
       shuffle: true
     target:
-      entity_id: media_player.living_room_sonos
-  - service: media_player.repeat_set
+      entity_id: media_player.living_room_arc
+  - service: media_player.media_next_track
+    data: {}
     target:
-      entity_id: media_player.living_room_sonos
-    data:
-      repeat: all
-  - service: media_player.volume_set
-    target:
-      entity_id: media_player.living_room_sonos
-    data:
-      volume_level: '{{ states(''input_number.home_music_volume_level'') }}'
-  - service: media_player.select_source
-    target:
-      entity_id: media_player.living_room_sonos
-    data:
-      source: '{{ states(''input_text.morning_music_source'') }}'
+      entity_id: media_player.living_room_arc
   mode: single
 doorbell:
   alias: Doorbell
@@ -122,21 +170,24 @@ doorbell:
     data:
       flash: short
     target:
-      entity_id: light.office_ceiling
+      entity_id:
+      - light.office_ceiling
+      - light.garden_table
+      - light.dining_table_up
   - service: script.turn_on
     data: {}
     target:
       entity_id: script.doorbell_light
   - service: sonos.snapshot
     data:
-      entity_id: media_player.living_room_sonos
+      entity_id: media_player.garden
   - service: media_player.media_pause
     target:
-      entity_id: media_player.living_room_sonos
+      entity_id: media_player.garden
     data: {}
   - service: media_player.volume_set
     target:
-      entity_id: media_player.living_room_sonos
+      entity_id: media_player.garden
     data:
       volume_level: 0.25
   - service: media_player.play_media
@@ -145,7 +196,7 @@ doorbell:
       media_content_type: music
     target:
       entity_id:
-      - media_player.living_room_sonos
+      - media_player.garden
   - service: media_player.play_media
     data:
       media_content_id: media-source://media_source/local/doorbell1.wav
@@ -160,7 +211,7 @@ doorbell:
       milliseconds: 500
   - service: media_player.repeat_set
     target:
-      entity_id: media_player.living_room_sonos
+      entity_id: media_player.garden
     data:
       repeat: 'off'
   - delay:
@@ -170,14 +221,14 @@ doorbell:
       milliseconds: 500
   - service: sonos.restore
     data:
-      entity_id: media_player.living_room_sonos
+      entity_id: media_player.garden
   - condition: state
     entity_id: group.awesome_people
     state: not_home
   - service: notify.mobile_app_cas_phone
     data:
       message: Someone just rang the door bell
-      title: Ding Dong 🔔
+      title: "Ding Dong \U0001F514"
   mode: single
   icon: mdi:bell
   max: 10
@@ -340,14 +391,13 @@ zha_store_click:
   - service: input_text.set_value
     data_template:
       entity_id: input_text.zha_click
-      value: "{%- set data = states(\"input_text.zha_click\").split(\",\") %} {%-\
-        \ set previous_device = data[0]|trim %} {%- set previous_command = data[1]|trim\
-        \ %} {%- set click = as_timestamp(now())|float %} {%- set previous_click =\
-        \ data[2]|float %} {%- set click_delta = click - previous_click %} {%- set\
-        \ click_count = data[3]|int %} {{- device|trim }}, {{- command|trim }}, {{-\
-        \ click }}, {%- if click_delta <= 0.5 and previous_device == device|trim and\
-        \ previous_command == command %}\n  {{- click_count + 1 }}\n{%- else %}\n\
-        \  {{- 1 }}\n{%- endif %}"
+      value: "{%- set data = states(\"input_text.zha_click\").split(\",\") %} {%-
+        set previous_device = data[0]|trim %} {%- set previous_command = data[1]|trim
+        %} {%- set click = as_timestamp(now())|float %} {%- set previous_click = data[2]|float
+        %} {%- set click_delta = click - previous_click %} {%- set click_count = data[3]|int
+        %} {{- device|trim }}, {{- command|trim }}, {{- click }}, {%- if click_delta
+        <= 0.5 and previous_device == device|trim and previous_command == command
+        %}\n  {{- click_count + 1 }}\n{%- else %}\n  {{- 1 }}\n{%- endif %}"
 determine_alarm_light_fade_time:
   alias: Determine alarm light fade time
   description: Figure out the time when the bedroom lights should start fading to
@@ -395,18 +445,18 @@ determine_last_day_of_month:
     target:
       entity_id: input_datetime.end_of_month
     data:
-      datetime: "{%- macro last_dayofmonth(month, year) -%}\n  {%- set daysinmonths\
-        \ = [31,28,31,30,31,30,31,31,30,31,30,31] -%}\n  {%- set month = month|int\
-        \ -%}  \n  {%- set year = year|int -%}\n  {# Simplified leap year calculation.\
-        \ See https://www.mathsisfun.com/leap-years.html #}\n  {%- set isleapyear\
-        \ = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) -%}\n  {%- set\
-        \ monthindex = month-1 -%}\n  {%- if month == 2 and isleapyear -%}\n    {{\
-        \ daysinmonths[monthindex]+1 }}\n  {%- else -%}\n    {{ daysinmonths[monthindex]\
-        \ }}\n  {%- endif -%}\n{%- endmacro -%} {%- set month = now().month -%} {%-\
-        \ set year = now().year -%} {%- set lastDay = last_dayofmonth(month, year)\
-        \ -%} {%- set lastDayDateString = (year | string) + \"-\" + (month | string)\
-        \ + \"-\" + (lastDay | string) + \"T23:59:55\" -%} {%- set lastDayDate = as_datetime(lastDayDateString)\
-        \ -%} {{ lastDayDate }}"
+      datetime: "{%- macro last_dayofmonth(month, year) -%}\n  {%- set daysinmonths
+        = [31,28,31,30,31,30,31,31,30,31,30,31] -%}\n  {%- set month = month|int -%}
+        \ \n  {%- set year = year|int -%}\n  {# Simplified leap year calculation.
+        See https://www.mathsisfun.com/leap-years.html #}\n  {%- set isleapyear =
+        year % 4 == 0 and (year % 100 != 0 or year % 400 == 0) -%}\n  {%- set monthindex
+        = month-1 -%}\n  {%- if month == 2 and isleapyear -%}\n    {{ daysinmonths[monthindex]+1
+        }}\n  {%- else -%}\n    {{ daysinmonths[monthindex] }}\n  {%- endif -%}\n{%-
+        endmacro -%} {%- set month = now().month -%} {%- set year = now().year -%}
+        {%- set lastDay = last_dayofmonth(month, year) -%} {%- set lastDayDateString
+        = (year | string) + \"-\" + (month | string) + \"-\" + (lastDay | string)
+        + \"T23:59:55\" -%} {%- set lastDayDate = as_datetime(lastDayDateString) -%}
+        {{ lastDayDate }}"
   mode: single
 turn_off_after_half_hour:
   sequence:

@@ -6,6 +6,9 @@
   create_group: All lights
   entities:
     - entity_id: light.garden_table
+    - entity_id: light.garden
+      fixed:
+        power: 25
     - create_group: Upstairs lights
       entities:
         - entity_id: light.bedroom_ceiling_1

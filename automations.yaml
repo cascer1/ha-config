@@ -6,7 +6,7 @@
     to: playing
   action:
   - service: media_player.media_pause
-    entity_id: media_player.living_room_sonos
+    entity_id: media_player.garden
   mode: single
 - id: leaving_home
   alias: Leaving home
@@ -26,7 +26,9 @@
   - service: media_player.media_pause
     data: {}
     target:
-      entity_id: media_player.living_room_sonos
+      entity_id:
+      - media_player.garden
+      - media_player.living_room_arc
   mode: single
 - id: returning_home
   alias: Returning home
@@ -45,6 +47,18 @@
   - service: input_boolean.turn_off
     target:
       entity_id: input_boolean.vacation_mode
+  mode: single
+- id: store_hourly_utility_usage
+  alias: Store hourly utility usage
+  trigger:
+  - platform: time_pattern
+    minutes: '59'
+    seconds: '59'
+  action:
+  - service: notify.utilityhourly
+    data_template:
+      message: ',{{states.sensor.energy_consumption_tarif_1.state}},{{states.sensor.energy_consumption_tarif_2.state}},{{states.sensor.energy_production_tarif_1.state}},{{states.sensor.energy_production_tarif_2.state}},{{states.sensor.gas_consumption.state}}'
+  initial_state: 'true'
   mode: single
 - id: store_daily_utility_usage
   alias: Store daily utility usage
@@ -90,11 +104,11 @@
     state: 'off'
   action:
   - service: media_player.media_pause
-    entity_id: media_player.living_room_sonos
-  - service: climate.turn_off
+    data: {}
     target:
       entity_id:
-      - climate.scullery
+      - media_player.garden
+      - media_player.living_room_arc
   mode: single
 - id: going_to_bed
   alias: Going to bed
@@ -122,25 +136,38 @@
     state: 'off'
   action:
   - service: script.thermostat_sleep
+    data: {}
   - service: media_player.media_pause
-    entity_id: media_player.living_room_sonos
+    data: {}
+    target:
+      entity_id:
+      - media_player.garden
+      - media_player.living_room_arc
   - service: light.turn_off
     target:
       entity_id:
       - light.inside
       - light.outside
+    data: {}
   - service: input_boolean.turn_on
     target:
       entity_id: input_boolean.night_time
+    data: {}
   mode: single
 - id: good_morning
   alias: Good Morning
   description: Triggers when first activity is detected downstairs
   trigger:
   - platform: state
-    entity_id: light.downstairs
+    entity_id:
+    - group.living_room_motion
     from: 'off'
     to: 'on'
+  - type: occupied
+    platform: device
+    device_id: 71d01d5b98272a2072492782adc87ec9
+    entity_id: binary_sensor.motion_f_occupancy
+    domain: binary_sensor
   condition:
   - condition: and
     conditions:
@@ -151,6 +178,7 @@
       state: 'off'
   action:
   - service: script.wake_up
+    data: {}
   mode: single
 - id: reset_states
   alias: Reset states
@@ -250,6 +278,7 @@
     - switch.adaptive_lighting_sleep_mode_downstairs
     - switch.adaptive_lighting_sleep_mode_hallway_upstairs
     - switch.adaptive_lighting_sleep_mode_hallway_downstairs
+    - switch.adaptive_lighting_sleep_mode_office
   variables:
     sleep_mode: '{{ states(''input_boolean.night_time'') }}'
   mode: single
@@ -381,19 +410,24 @@
           flash: short
       power_short:
       - service: media_player.media_play_pause
-        target:
-          entity_id: media_player.living_room_sonos
         data: {}
+        target:
+          entity_id: media_player.living_room_arc
       colorup_short:
       - service: light.toggle
         data: {}
         target:
-          entity_id: light.outside
+          area_id: garden
       dimup_short:
       - service: input_boolean.toggle
         data: {}
         target:
           entity_id: input_boolean.night_time
+      power_short_double:
+      - service: media_player.media_next_track
+        data: {}
+        target:
+          entity_id: media_player.garden
 - id: '1626167291086'
   alias: Next alarm time changed
   description: ''
@@ -528,7 +562,10 @@
   action:
   - service: media_player.media_pause
     target:
-      entity_id: media_player.living_room_sonos
+      entity_id:
+      - media_player.garden
+      - media_player.living_room_arc
+    data: {}
   mode: single
 - id: '1628594764783'
   alias: Notify motion scullery
@@ -629,7 +666,9 @@
       transition: 15
       brightness: 205
     target:
-      entity_id: light.garden_table
+      entity_id:
+      - light.garden_table
+      - light.garden
   mode: single
 - id: '1633325316903'
   alias: sun rising
@@ -708,7 +747,7 @@
       automation_blocker_boolean: true
       no_motion_blocker_boolean: true
       light_sensor: sensor.motion_e_illuminance
-      light_level: 60
+      light_level: 50
       scene_morning: scene.upstairs_hallway_morning
       scene_day: scene.upstairs_hallway_day
       scene_evening: scene.upstairs_hallway_evening
@@ -977,7 +1016,7 @@
           - light.scullery
           - light.garden_table
       on_long:
-      - type: turn_on
+      - type: toggle
         device_id: adca78ce5ccc0f695957716cd0ef5726
         entity_id: switch.tradfri_plug_d
         domain: switch
@@ -997,12 +1036,13 @@
       - service: media_player.media_play_pause
         data: {}
         target:
-          entity_id: media_player.living_room_sonos
+          entity_id:
+          - media_player.living_room_arc
       clockwise:
       - condition: device
-        device_id: eb612c5ef6b9bafe836db238c680c8b7
+        device_id: 63f54d7f3098a47f14a5a25554006249
         domain: media_player
-        entity_id: media_player.living_room_sonos
+        entity_id: media_player.living_room_arc
         type: is_playing
       - repeat:
           count: '20'
@@ -1010,7 +1050,7 @@
           - service: media_player.volume_up
             data: {}
             target:
-              entity_id: media_player.living_room_sonos
+              entity_id: media_player.living_room_arc
           - delay:
               hours: 0
               minutes: 0
@@ -1018,9 +1058,9 @@
               milliseconds: 250
       counter_clockwise:
       - condition: device
-        device_id: eb612c5ef6b9bafe836db238c680c8b7
+        device_id: 63f54d7f3098a47f14a5a25554006249
         domain: media_player
-        entity_id: media_player.living_room_sonos
+        entity_id: media_player.living_room_arc
         type: is_playing
       - repeat:
           count: '20'
@@ -1028,9 +1068,59 @@
           - service: media_player.volume_down
             data: {}
             target:
-              entity_id: media_player.living_room_sonos
+              entity_id: media_player.living_room_arc
           - delay:
               hours: 0
               minutes: 0
               seconds: 0
               milliseconds: 250
+- id: '1655908039977'
+  alias: Turn on AC if temperature exceeds 30
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: climate.tstat_8d728f
+    above: '30'
+    attribute: current_temperature
+  - platform: numeric_state
+    entity_id: climate.office
+    attribute: current_temperature
+    above: '30'
+  condition:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: group.awesome_people
+      state: home
+  action:
+  - service: climate.turn_on
+    data: {}
+    target:
+      entity_id:
+      - climate.living_room
+      - climate.bedroom
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 15
+      milliseconds: 0
+  - service: climate.set_temperature
+    data:
+      temperature: 22
+      hvac_mode: cool
+    target:
+      entity_id:
+      - climate.living_room
+      - climate.bedroom
+  - delay:
+      hours: 0
+      minutes: 30
+      seconds: 0
+      milliseconds: 0
+  - service: climate.turn_on
+    data: {}
+    target:
+      entity_id:
+      - climate.bedroom
+      - climate.living_room
+  mode: single

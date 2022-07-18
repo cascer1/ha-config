@@ -30,7 +30,10 @@ tts:
 
 sonos:
   media_player:
-    hosts: !secret network_sonos_hosts
+    hosts:
+      - 10.10.10.90
+      - 10.10.10.91
+    #hosts: !secret network_sonos_hosts
     advertise_addr: !secret network_hass_host
 
 powercalc:
@@ -41,6 +44,7 @@ powercalc:
   energy_sensor_naming: "{} Energy"
 
 recorder:
+  purge_keep_days: 14
   commit_interval: 10
   exclude:
     entity_globs:
@@ -75,10 +79,6 @@ history:
       - switch.adaptive_lighting*
       - automation
       - adguard
-
-spotify:
-  client_id: !secret spotify_client_id
-  client_secret: !secret spotify_client_secret
 
 group: !include groups.yaml
 automation: !include automations.yaml

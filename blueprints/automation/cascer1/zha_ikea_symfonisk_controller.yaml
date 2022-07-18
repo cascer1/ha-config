@@ -31,7 +31,7 @@ blueprint:
       selector:
         action: {}
       default: []
-mode: single
+mode: restart
 max_exceeded: silent
 trigger:
 - platform: event
@@ -56,4 +56,3 @@ action:
     - condition: template
       value_template: '{{ trigger.event.data.args == [1,195,0,0] }}'
     sequence: !input 'counter_clockwise'
-- delay: 0.5
