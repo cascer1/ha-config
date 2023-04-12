@@ -1,12 +1,10 @@
-home_music_source_bert:
-  name: "Bert Home Music"
-  icon: mdi:music
-home_music_source_cas:
-  name: "Cas Home Music"
-  icon: mdi:music
-morning_music_source:
-  name: "Morning Music Source"
-  icon: mdi:music
 zha_click:
   name: "ZHA click tracking"
   icon: mdi:table-clock
+charge_vehicle_number:
+  name: "Vehicle Identification Number"
+  icon: mdi:car
+charge_full_time:
+  name: "Car charge full time"
+  icon: mdi:clock
+  pattern: "[0-9][0-9]:[0-9][0-9]"

@@ -14,33 +14,21 @@
         - entity_id: light.bedroom_ceiling_1
         - entity_id: light.bedroom_ceiling_2
         - entity_id: light.office_ceiling
-          linear:
-            min_power: 2
-            max_power: 39
-          standby_power: 0.2
+          manufacturer: signify
+          model: LTC002
         - entity_id: light.upstairs_hallway_ceiling
-          linear:
-            min_power: 1.5
-            max_power: 8
-          standby_power: 0.2
+          manufacturer: signify
+          model: 5060830P7
         - entity_id: light.upstairs_hallway_spot_stairs
           manufacturer: signify
-          model: LCT003
+          model: LCG002
         - entity_id: light.upstairs_hallway_spot_wall
           manufacturer: signify
-          model: LCT003
+          model: LCG002
     - create_group: Downstairs lights
       entities:
         - entity_id: light.dining_table_down
-          linear:
-            min_power: 2
-            max_power: 19.5
-          standby_power: 0.2
         - entity_id: light.dining_table_up
-          linear:
-            min_power: 2
-            max_power: 19.5
-          standby_power: 0.2
         - entity_id: light.kitchen_cabinets
           linear:
             calibrate:
@@ -49,28 +37,19 @@
               - 128 -> 4.1
               - 196 -> 8.4
               - 254 -> 17.6
-          standby_power: 0.2
+          standby_power: 0.4
         - entity_id: light.kitchen_ceiling
-          linear:
-            min_power: 5
-            max_power: 46.5
-          standby_power: 0.2
         - entity_id: light.living_room_ceiling
         - entity_id: light.living_room_corner
         - entity_id: light.downstairs_hallway_spot_1
-          manufacturer: signify
-          model: LCT003
         - entity_id: light.downstairs_hallway_spot_2
-          manufacturer: signify
-          model: LCT003
         - entity_id: light.downstairs_hallway_spot_3
-          manufacturer: signify
-          model: LCT003
         - entity_id: light.downstairs_hallway_ceiling
+        - entity_id: light.signe_gradient_table_1
           linear:
-            min_power: 1.5
-            max_power: 10
-          standby_power: 0.2
+            min_power: 1
+            max_power: 12
+          standby_power: 0.4
     - create_group: Scullery lights
       entities:
         - entity_id: light.scullery_cabinets
@@ -81,7 +60,7 @@
               - 128 -> 4.9
               - 196 -> 10.1
               - 254 -> 21.4
-          standby_power: 0.2
+          standby_power: 0.4
         - entity_id: light.scullery_spot_1
         - entity_id: light.scullery_spot_2
         - entity_id: light.scullery_window

@@ -32,11 +32,23 @@ office_heat:
   name: Office heat required
 bathroom_heat:
   name: Bathroom heat required
-hallway_heat:
-  name: Hallway heat required
 office_occupied_recently:
   name: Office occupied recently
 upstairs_occupied_recently:
   name: Upstairs occupied recently
+living_room_occupied_recently:
+  name: Living room occupied recently
 dashboard:
   name: Google Home Dashboard
+fully_charge_car:
+  name: Fully charge car
+normal_heating_off_if_away:
+  name: Normal heating off if away
+normal_heating_off_if_cold:
+  name: Normal heating off if cold
+ac_heating_off_if_away:
+  name: AC Heating off if away
+ac_heating_off_if_cold:
+  name: AC Heating off if cold
+automatic_charging:
+  name: Automatically start car charger

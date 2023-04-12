@@ -57,13 +57,16 @@
   - name: "Electricity price offset"
     unique_id: electricity_price_offset
     unit_of_measurement: "€/kWh"
-    state: "{{ (states('sensor.current_electricity_price_all_in') | float(0) - states('sensor.average_electricity_price_today') | float(0) ) | round(2) }}"
+    state: "{{ (states('sensor.zonneplan_current_electricity_tariff') | float(0) - states('sensor.average_electricity_price_today_2') | float(0) ) | round(3) }}"
+  - name: "Gas price"
+    unique_id: gas_price
+    unit_of_measurement: "€/m³"
+    state: "{{ (states('sensor.current_gas_market_price') | float(0) * 1.21) + 0.05 + 0.59266 }}"
   binary_sensor:
     - name: "Heating required"
       unique_id: heating_required
       state: "{{ states('input_boolean.office_heat') == 'on'
-        or states('input_boolean.hallway_heat') == 'on'
         or states('input_boolean.bathroom_heat') == 'on' }}"
     - name: "Cheap electricity"
       unique_id: cheap_electricity
-      state: "{{ states('sensor.average_electricity_price_today') | float(0) > states('sensor.current_electricity_price_all_in') | float(0) }}"
+      state: "{{ states('sensor.average_electricity_price_today_2') | float(0) > states('sensor.zonneplan_current_electricity_tariff') | float(0) }}"

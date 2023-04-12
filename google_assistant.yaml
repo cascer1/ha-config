@@ -3,32 +3,27 @@
   report_state: true
   exposed_domains:
     - light
-    - switch
     - climate
   expose_by_default: false
   entity_config:
     light.office_ceiling:
       name: Office Light
-      aliases:
-        - Office Lights
-        - Office
     light.bedroom:
       name: Bedroom Lights
-      aliases:
-        - Bedroom Light
-        - Bedroom
     light.living_room:
+      name: Living Room Lights
+    light.downstairs:
       name: Downstairs Lights
-      aliases:
-        - Downstairs Light
-        - Downstairs
+    light.upstairs:
+      name: Upstairs Lights
     light.kitchen:
       name: Kitchen Lights
-      aliases:
-        - Kitchen Light
-        - Kitchen
     light.scullery:
       name: Scullery Lights
+    light.garden:
+      name: Garden Lights
+    light.garden_table:
+      name: Garden Table Light
     climate.living_room:
       name: Living Room AC
     climate.bedroom:
@@ -39,3 +34,11 @@
       name: Upstairs Hallway
     input_boolean.dashboard:
       name: Dashboard
+    sensor.temp_a_humidity:
+      name: Scullery Humidity
+    sensor.temp_b_humidity:
+      name: Living Room Humidity
+    sensor.temp_c_humidity:
+      name: Office Humidity
+    sensor.temp_d_humidity:
+      name: Bathroom Humidity

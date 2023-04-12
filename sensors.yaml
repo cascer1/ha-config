@@ -16,6 +16,10 @@
       friendly_name: 'Solar Energy Today'
       unit_of_measurement: 'kWh'
       value_template: "{{ (states('sensor.solaredge_energy_today') | float(0)) / 1000 | round(3) }}"
+    power_production_tariff:
+      friendly_name: 'Power Production Tariff'
+      unit_of_measurement: '€/kWh'
+      value_template: "{{ ((states('sensor.current_electricity_market_price') | float(0.1)) - ((states('sensor.current_electricity_sourcing_markup') | float(0.023)) - 0.029)) * 1.21 }}"
 - platform: average
   unique_id: average_consumption_net
   name: Average power consumption (net)
@@ -27,9 +31,12 @@
 - platform: average
   unique_id: living_room_illuminance
   name: Living Room Illuminance
+  process_undef_as: 0
   entities:
     - sensor.motion_a_illuminance
     - sensor.motion_b_illuminance
+  duration:
+    minutes: 5
 - platform: average
   unique_id: average_consumption
   name: Average Power Consumption
@@ -60,23 +67,22 @@
   entities:
     - sensor.shelly_plug_2_power
   duration:
-    minutes: 60
+    minutes: 20
   process_undef_as: 0
-- platform: derivative
-  source: sensor.temp_d_humidity
-  name: Bathroom humidity change
 - platform: statistics
   name: "Average Electricity Cost"
   unique_id: average_electricity_cost
-  entity_id: sensor.current_electricity_price_all_in
+  entity_id: sensor.zonneplan_current_electricity_tariff
   state_characteristic: mean
+  sampling_size: 20
   max_age:
     hours: 24
 - platform: statistics
   name: "Average Gas Cost"
   unique_id: average_gas_cost
-  entity_id: sensor.current_gas_price_all_in
+  entity_id: sensor.zonneplan_current_gas_tariff
   state_characteristic: mean
+  sampling_size: 20
   max_age:
     hours: 24
 - platform: average
@@ -87,5 +93,10 @@
   duration:
     minutes: 30
   process_undef_as: 0
-
-
+- platform: average
+  unique_id: average_power_flow
+  name: Average Power Flow
+  entities:
+    - sensor.power_flow_net
+  duration:
+    minutes: 10

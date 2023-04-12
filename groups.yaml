@@ -15,3 +15,8 @@ upstairs_motion:
   entities:
     - binary_sensor.motion_c_activity
     - binary_sensor.motion_e_activity
+downstairs_motion:
+  name: Downstairs Motion
+  entities:
+    - group.living_room_motion
+    - binary_sensor.motion_f_activity

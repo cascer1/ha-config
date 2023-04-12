@@ -1,0 +1,191 @@
+blueprint:
+  name: Zone heating
+  description: Manage heating in a zone based on occupance
+  domain: automation
+  source_url: https://github.com/cascer1/ha-config/blob/master/blueprints/automation/cascer1/zone_heating.yaml
+  input:
+    climate_mode_sensor:
+      name: Climate mode selector
+      selector:
+        entity: 
+          domain: input_select
+    thermostat:
+      name: Thermostat
+      selector:
+        entity:
+          domain: climate
+    zone_occupance_sensor:
+      name: Zone occupance sensor
+      selector:
+        entity:
+          domain: input_boolean
+    home_occupance_sensor:
+      name: Home occupance sensor
+      selector:
+        entity:
+          domain: input_boolean
+    vacation_mode_sensor:
+      name: Vaction mode sensor
+      selector:
+        entity:
+          domain: input_boolean
+    heating_schedule_sensor:
+      name: Heating schedule sensor
+      selector:
+        entity:
+          domain: schedule
+    occupied_temperature:
+      name: Occupied temperature entity
+      selector:
+        entity:
+          domain: input_number
+    unoccupied_temperature:
+      name: Unoccupied temperature entity
+      selector:
+        entity:
+          domain: input_number
+    cold_temperature:
+      name: Cold temperature entity
+      selector:
+        entity:
+          domain: input_number
+    away_temperature:
+      name: Away temperature entity
+      selector:
+        entity:
+          domain: input_number
+    vacation_temperature:
+      name: Vacation temperature entity
+      selector:
+        entity:
+          domain: input_number
+# If motion is detected within the delay,
+# we restart the script.
+mode: restart
+max_exceeded: silent
+
+trigger:
+  - platform: state
+    entity_id:
+      - !input climate_mode_sensor
+      - !input zone_occupance_sensor
+      - !input home_occupance_sensor
+      - !input heating_schedule_sensor
+      - !input occupied_temperature
+      - !input unoccupied_temperature
+      - !input away_temperature
+      - !input vacation_temperature
+
+variables:
+  occupied_temperature: !input 'occupied_temperature'
+  unoccupied_temperature: !input 'unoccupied_temperature'
+  cold_temperature: !input 'cold_temperature'
+  away_temperature: !input 'away_temperature'
+  vacation_temperature: !input 'vacation_temperature'
+
+action:
+  - if:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: !input climate_mode_sensor
+          state: "heat"
+    then:
+      - service: climate.turn_off
+        target:
+          entity_id: !input thermostat
+      - stop: Completed in not heating mode
+    alias: Check heating mode
+  - if:
+    - condition: state
+      entity_id: !input vacation_mode_sensor
+      state: "on"
+    then:
+      - choose:
+        - conditions:
+          - condition: state
+            entity_id: !input heating_schedule_sensor
+            state: "on"
+          sequence:
+            - service: climate.turn_on
+              target:
+                entity_id: !input thermostat
+            - service: climate.set_temperature
+              data:
+                temperature: '{{ states[vacation_temperature].state | float(12) }}'
+              target:
+                entity_id: !input thermostat
+        - conditions:
+          - condition: state
+            entity_id: !input heating_schedule_sensor
+            state: "off"
+          sequence:
+            - service: climate.turn_off
+              target:
+                entity_id: !input thermostat
+      - stop: Completed in vacation mode
+    alias: Check vacation mode
+  - if:
+    - condition: state
+      entity_id: !input home_occupance_sensor
+      state: "off"
+    then:
+      - choose:
+        - conditions:
+          - condition: state
+            entity_id: !input heating_schedule_sensor
+            state: "on"
+          sequence:
+            - service: climate.set_temperature
+              data:
+                temperature: '{{ states[away_temperature].state | float(14) }}'
+              target:
+                entity_id: !input thermostat
+        - conditions:
+          - condition: state
+            entity_id: !input heating_schedule_sensor
+            state: "off"
+          sequence:
+            - service: climate.turn_off
+              target:
+                entity_id: !input thermostat
+      - stop: Completed in away mode
+    alias: Check away mode
+  - if:
+    - condition: state
+      entity_id: !input heating_schedule_sensor
+      state: "off"
+    then:
+      - service: climate.turn_on
+        target:
+          entity_id: !input thermostat
+      - service: climate.set_temperature
+        target:
+          entity_id: !input thermostat
+        data:
+          temperature: '{{ states[cold_temperature].state | float(14) }}'
+      - stop: Completed in off mode
+    alias: Check schedule mode
+  - if:
+    - condition: state
+      entity_id: !input zone_occupance_sensor
+      state: "off"
+    then:
+      - service: climate.turn_on
+        target:
+          entity_id: !input thermostat
+      - service: climate.set_temperature
+        target:
+          entity_id: !input thermostat
+        data:
+          temperature: '{{ states[unoccupied_temperature].state | float(14) }}'
+      - stop: Completed in unoccupied mode
+    alias: Check occupance mode
+  - service: climate.turn_on
+    target:
+      entity_id: !input thermostat
+  - service: climate.set_temperature
+    target:
+      entity_id: !input thermostat
+    data:
+      temperature: '{{ states[occupied_temperature].state | float(14) }}'

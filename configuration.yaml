@@ -12,15 +12,22 @@ http:
   ip_ban_enabled: true
   login_attempts_threshold: 5
   use_x_forwarded_for: true
-  trusted_proxies:
-    - !secret trusted_proxy_host
+  trusted_proxies: !secret trusted_proxy_hosts
 
 ## Configure a default setup of Home Assistant Core (frontend, api, etc)
 # Learn more at https://www.home-assistant.io/integrations/default_config
 default_config:
 
+logger:
+  default: warning
+  logs:
+    custom_components.ocpp: warning
+    custom_components.pyscript.file: info
+
 frontend:
   themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /hacsfiles/hass-hue-icons/hass-hue-icons.js
 
 google_assistant: !include google_assistant.yaml
 
@@ -34,10 +41,10 @@ sonos:
       - 10.10.10.90
       - 10.10.10.91
     #hosts: !secret network_sonos_hosts
-    advertise_addr: !secret network_hass_host
+    advertise_addr: !secret network_hass_host_sonos
 
 powercalc:
-  scan_interval: 00:20:00
+  force_update_frequency: 00:20:00
   create_energy_sensors: true
   enable_autodiscovery: false
   power_sensor_naming: "{} Power"
@@ -80,6 +87,10 @@ history:
       - automation
       - adguard
 
+rest_command:
+  preheat_car:
+    url: "https://car.eliens.co/preconditioning/VXKUKZKXZNW066336/1"
+
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
@@ -97,3 +108,5 @@ input_boolean: !include input_boolean.yaml
 input_select: !include input_select.yaml
 template: !include templates.yaml
 climate: !include climate.yaml
+pyscript: !include pyscript/config.yaml
+alarm_control_panel: !include alarms.yaml

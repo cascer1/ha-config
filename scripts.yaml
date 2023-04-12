@@ -9,19 +9,7 @@ thermostat_away:
       entity_id:
       - climate.bedroom
       - climate.living_room
-  - service: climate.set_preset_mode
-    target:
-      entity_id:
-      - climate.office
-      - climate.bathroom
-      - climate.hallway
-    data:
-      preset_mode: away
-  - service: climate.set_temperature
-    target:
-      entity_id: climate.tstat_8d728f
-    data:
-      temperature: 14
+    data: {}
 thermostat_home:
   alias: Thermostat to home
   description: Set the thermostat temperature to the configured home temperature
@@ -40,87 +28,25 @@ thermostat_home:
 home_music:
   alias: Home Music
   sequence:
-  - choose:
-    - conditions:
-      - condition: state
-        entity_id: person.cas_eliens
-        state: home
-      sequence:
-      - service: media_player.play_media
-        target:
-          entity_id: media_player.living_room_arc
-        data:
-          media_content_id: FV:2/19
-          media_content_type: favorite_item_id
-        metadata:
-          title: Living Room
-          thumbnail: https://mosaic.scdn.co/640/ab67616d0000b273583f1300f2b356b42dd231b4ab67616d0000b2738b62f896e8d3ca8dad7588e7ab67616d0000b273f1ea3305aa003425dda05882ab67616d0000b273f60070dce96a2c1b70cf6ff0
-          media_class: playlist
-          children_media_class:
-          navigateIds:
-          - {}
-          - media_content_type: favorites
-            media_content_id: ''
-          - media_content_type: favorites_folder
-            media_content_id: object.container.playlistContainer
-    default:
-    - service: media_player.play_media
-      target:
-        entity_id: media_player.living_room_arc
-      data:
-        media_content_id: FV:2/19
-        media_content_type: favorite_item_id
-      metadata:
-        title: Living Room
-        thumbnail: https://mosaic.scdn.co/640/ab67616d0000b273583f1300f2b356b42dd231b4ab67616d0000b2738b62f896e8d3ca8dad7588e7ab67616d0000b273f1ea3305aa003425dda05882ab67616d0000b273f60070dce96a2c1b70cf6ff0
-        media_class: playlist
-        children_media_class:
-        navigateIds:
-        - {}
-        - media_content_type: favorites
-          media_content_id: ''
-        - media_content_type: favorites_folder
-          media_content_id: object.container.playlistContainer
-  - service: media_player.volume_set
-    entity_id: media_player.living_room_arc
+  - service: media_player.join
     data:
-      volume_level: '{{ states(''input_number.home_music_volume_level'') }}'
+      group_members:
+      - media_player.living_room_arc
+      - media_player.upstairs
+    target:
+      entity_id:
+      - media_player.living_room_arc
+      - media_player.upstairs
   - service: media_player.shuffle_set
     data:
       shuffle: true
     target:
       entity_id: media_player.living_room_arc
-  - service: media_player.repeat_set
-    data:
-      repeat: all
-    target:
-      entity_id: media_player.living_room_arc
-  - service: media_player.media_next_track
-    data: {}
-    target:
-      entity_id: media_player.living_room_arc
-  mode: single
-  icon: mdi:music
-wake_up:
-  alias: Wake Up
-  icon: mdi:alarm
-  sequence:
-  - service: script.turn_on
-    target:
-      entity_id: script.morning_music
-  - service: input_boolean.turn_on
-    entity_id: input_boolean.woken_up
-  - service: switch.turn_on
-    target:
-      entity_id: switch.adaptive_lighting_bedroom
-  - service: input_boolean.turn_on
-    target:
-      entity_id: input_boolean.living_room_automatic_lights
-  mode: single
-morning_music:
-  alias: Morning Music
-  icon: mdi:music
-  sequence:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
   - service: media_player.play_media
     target:
       entity_id: media_player.living_room_arc
@@ -139,8 +65,11 @@ morning_music:
       - media_content_type: favorites_folder
         media_content_id: object.container.playlistContainer
   - service: media_player.volume_set
-    target:
-      entity_id: media_player.living_room_arc
+    entity_id: media_player.living_room_arc
+    data:
+      volume_level: '{{ states(''input_number.home_music_volume_level'') }}'
+  - service: media_player.volume_set
+    entity_id: media_player.upstairs
     data:
       volume_level: '{{ states(''input_number.home_music_volume_level'') }}'
   - service: media_player.repeat_set
@@ -148,15 +77,30 @@ morning_music:
       repeat: all
     target:
       entity_id: media_player.living_room_arc
-  - service: media_player.shuffle_set
-    data:
-      shuffle: true
-    target:
-      entity_id: media_player.living_room_arc
   - service: media_player.media_next_track
     data: {}
     target:
       entity_id: media_player.living_room_arc
+  mode: single
+  icon: mdi:music
+wake_up:
+  alias: Wake Up
+  icon: mdi:alarm
+  sequence:
+  - service: script.turn_on
+    data: {}
+    target:
+      entity_id: script.home_music
+  - service: input_boolean.turn_on
+    entity_id: input_boolean.woken_up
+  - service: switch.turn_on
+    target:
+      entity_id: switch.adaptive_lighting_bedroom
+    data: {}
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.living_room_automatic_lights
+    data: {}
   mode: single
 doorbell:
   alias: Doorbell
@@ -174,29 +118,29 @@ doorbell:
       - light.office_ceiling
       - light.garden_table
       - light.dining_table_up
+      - light.dining_table_down
   - service: script.turn_on
     data: {}
     target:
       entity_id: script.doorbell_light
   - service: sonos.snapshot
     data:
-      entity_id: media_player.garden
+      entity_id: media_player.upstairs
   - service: media_player.media_pause
-    target:
-      entity_id: media_player.garden
     data: {}
-  - service: media_player.volume_set
     target:
-      entity_id: media_player.garden
+      entity_id: media_player.upstairs
+  - service: media_player.volume_set
     data:
       volume_level: 0.25
+    target:
+      entity_id: media_player.upstairs
   - service: media_player.play_media
     data:
       media_content_id: https://assistant.eliens.co/local/doorbell1.wav
       media_content_type: music
     target:
-      entity_id:
-      - media_player.garden
+      entity_id: media_player.upstairs
   - service: media_player.play_media
     data:
       media_content_id: media-source://media_source/local/doorbell1.wav
@@ -204,16 +148,17 @@ doorbell:
     target:
       entity_id:
       - media_player.office_speaker
+    enabled: false
   - delay:
       hours: 0
       minutes: 0
       seconds: 1
       milliseconds: 500
   - service: media_player.repeat_set
-    target:
-      entity_id: media_player.garden
     data:
       repeat: 'off'
+    target:
+      entity_id: media_player.upstairs
   - delay:
       hours: 0
       minutes: 0
@@ -221,7 +166,7 @@ doorbell:
       milliseconds: 500
   - service: sonos.restore
     data:
-      entity_id: media_player.garden
+      entity_id: media_player.upstairs
   - condition: state
     entity_id: group.awesome_people
     state: not_home
@@ -231,7 +176,6 @@ doorbell:
       title: "Ding Dong \U0001F514"
   mode: single
   icon: mdi:bell
-  max: 10
 reload_climate_automations:
   alias: Execute climate schedules
   sequence:
@@ -307,82 +251,6 @@ thermostat_sleep:
         target:
           entity_id: climate.living_room
     default: []
-flash_light:
-  alias: Flash Light
-  mode: queued
-  icon: mdi:flash_alert_outline
-  fields:
-    flash_mode:
-      name: Flash Mode
-      description: Flash mode to use
-      required: true
-      selector:
-        select:
-          options:
-          - short
-          - long
-    light_entity:
-      name: Lights to flash
-      required: true
-      selector:
-        target:
-          entity:
-            domain: light
-    adaptive_light_entity:
-      name: Adaptive light switches to manage
-      required: true
-      selector:
-        target:
-          entity:
-            domain: switch
-  sequence:
-  - service: scene.create
-    data:
-      scene_id: light_flash_state
-      snapshot_entities: '{{ light_entity.entity_id }}'
-  - service: scene.create
-    data:
-      scene_id: light_flash_adaptive_state
-      snapshot_entities: '{{ adaptive_light_entity.entity_id }}'
-  - service: switch.turn_off
-    target: '{{ adaptive_light_entity }}'
-  - service: light.turn_on
-    target: '{{ light_entity }}'
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 1
-      milliseconds: 0
-  - service: light.turn_on
-    target: '{{ light_entity }}'
-    data:
-      flash: '{{ flash_mode }}'
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ flash_mode == "short" }}'
-      sequence:
-      - delay: 1
-    - conditions:
-      - condition: template
-        value_template: '{{ flash_mode == "long" }}'
-      sequence:
-      - delay: 16
-    default: []
-  - service: scene.turn_on
-    target:
-      entity_id:
-      - scene.light_flash_state
-  - delay:
-      hours: 0
-      minutes: 0
-      seconds: 3
-      milliseconds: 0
-  - service: scene.turn_on
-    target:
-      entity_id:
-      - scene.light_flash_adaptive_state
-  max: 10
 zha_store_click:
   alias: Store ZHA click
   description: Store the most recent ZHA event
@@ -404,8 +272,10 @@ determine_alarm_light_fade_time:
     on
   mode: single
   variables:
-    bertTime: '{{ states(''sensor.bert_phone_next_alarm'') | as_timestamp | int }}'
-    casTime: '{{ states(''sensor.cas_phone_next_alarm'') | as_timestamp | int }}'
+    bertTime: '{{ states(''sensor.bert_phone_next_alarm'') | as_timestamp(''9999999000'')
+      | int }}'
+    casTime: '{{ states(''sensor.cas_phone_next_alarm'') | as_timestamp(''9999999000'')
+      | int }}'
     bertHome: '{{ states(''person.bert'') == ''home'' }}'
     casHome: '{{ states(''person.cas_eliens'') == ''home'' }}'
   sequence:
@@ -520,22 +390,6 @@ boiler_heating:
     domain: switch
   mode: restart
   icon: mdi:fire
-'1637064927134':
-  alias: Start vacuum
-  sequence:
-  - condition: state
-    entity_id: vacuum.noo_noo
-    state: docked
-    for:
-      hours: 15
-      minutes: 0
-      seconds: 0
-      milliseconds: 0
-  - service: vacuum.start
-    target:
-      entity_id: vacuum.noo_noo
-  mode: single
-  icon: mdi:robot-vacuum
 radiator_fan_office_on:
   alias: radiator fan office on
   sequence:
@@ -576,3 +430,198 @@ doorbell_light:
     target:
       entity_id: light.wled
   mode: single
+automatic_cooling:
+  alias: Automatic cooling
+  sequence:
+  - service: notify.mobile_app_cas_phone
+    data:
+      title: Inside temperature high
+      message: Inside temperature exceeds 30°C. Starting automatic cooling.
+      data:
+        tag: automatic-cooling
+        channel: Climate
+        sticky: 'true'
+        persistent: 'false'
+        visibility: public
+        color: red
+        clickAction: /lovelace-home/climate
+        actions:
+        - action: STOP_AUTOMATIC_COOLING
+          title: Stop Cooling
+  - service: climate.turn_on
+    data: {}
+    target:
+      entity_id:
+      - climate.living_room
+      - climate.bedroom
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: climate.set_hvac_mode
+    data:
+      hvac_mode: cool
+    target:
+      entity_id:
+      - climate.living_room
+      - climate.bedroom
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: climate.set_temperature
+    data:
+      temperature: 25
+      hvac_mode: cool
+    target:
+      entity_id:
+      - climate.bedroom
+      - climate.living_room
+  - service: climate.set_fan_mode
+    data:
+      fan_mode: NATURE
+    target:
+      entity_id:
+      - climate.living_room
+      - climate.bedroom
+  - service: notify.mobile_app_cas_phone
+    data:
+      title: Inside temperature high
+      message: Running automatic cooling
+      data:
+        tag: automatic-cooling
+        channel: Climate
+        sticky: 'true'
+        persistent: 'true'
+        visibility: public
+        color: red
+        clickAction: /lovelace-home/climate
+        chronometer: 'true'
+        when: '{{now() | as_timestamp | round - 5}}'
+        actions:
+        - action: STOP_AUTOMATIC_COOLING
+          title: Stop Cooling
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: climate.tstat_8d728f
+      below: '25'
+      attribute: current_temperature
+      for:
+        hours: 0
+        minutes: 5
+        seconds: 0
+    - platform: numeric_state
+      entity_id: climate.office
+      attribute: current_temperature
+      for:
+        hours: 0
+        minutes: 5
+        seconds: 0
+      below: '25'
+    timeout: 00:01:00
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: numeric_state
+          entity_id: climate.tstat_8d728f
+          attribute: current_temperature
+          below: '25'
+        - condition: numeric_state
+          entity_id: climate.office
+          attribute: current_temperature
+          below: '25'
+      sequence:
+      - service: notify.mobile_app_cas_phone
+        data:
+          title: Inside temperature normal
+          message: Automatic cooling completed
+          data:
+            tag: automatic-cooling
+            channel: Climate
+            sticky: 'true'
+            persistent: 'false'
+            visibility: public
+            color: blue
+            clickAction: /lovelace-home/climate
+            actions:
+            - action: RUN_AUTOMATIC_COOLING
+              title: Cool 1 hour
+    default:
+    - service: notify.mobile_app_cas_phone
+      data:
+        title: Inside temperature high
+        message: Automatic cooling stopped after 1 hour. Current temperature still
+          exceeds 25°C.
+        data:
+          tag: automatic-cooling
+          channel: Climate
+          sticky: 'true'
+          persistent: 'false'
+          visibility: public
+          color: red
+          clickAction: /lovelace-home/climate
+          actions:
+          - action: RUN_AUTOMATIC_COOLING
+            title: Cool 1 hour
+  - service: climate.turn_off
+    data: {}
+    target:
+      entity_id:
+      - climate.bedroom
+      - climate.living_room
+  mode: single
+determine_desired_charge_speed:
+  alias: Determine desired charge speed
+  sequence:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.fully_charge_car
+        state: 'on'
+      sequence:
+      - service: input_number.set_value
+        data:
+          value: 16
+        target:
+          entity_id: input_number.charge_speed
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.fully_charge_car
+        state: 'off'
+      sequence:
+      - service: pyscript.calculate_charge_speed
+        data: {}
+  mode: queued
+  icon: mdi:ev-station
+  max: 10
+preheat_car:
+  alias: Preheat car
+  sequence:
+  - service: rest_command.preheat_car
+    data: {}
+  mode: single
+  icon: mdi:heat-wave
+movie_mode:
+  alias: Movie mode
+  sequence:
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.living_room_automatic_lights
+  - service: scene.turn_on
+    target:
+      entity_id: scene.living_room_movie
+    metadata: {}
+  - service: media_player.media_pause
+    data: {}
+    target:
+      entity_id: media_player.upstairs
+  - type: turn_on
+    device_id: 63f54d7f3098a47f14a5a25554006249
+    entity_id: switch.living_room_surround_music_full_volume
+    domain: switch
+  mode: single
+  icon: mdi:theater

@@ -2,11 +2,12 @@
   alias: Watching TV
   trigger:
   - platform: state
-    entity_id: media_player.plex_plex_for_android_tv_living_room_tv
-    to: playing
+    entity_id:
+    - sensor.living_room_audio_input_format
+    from: No input
   action:
   - service: media_player.media_pause
-    entity_id: media_player.garden
+    entity_id: media_player.upstairs
   mode: single
 - id: leaving_home
   alias: Leaving home
@@ -27,8 +28,10 @@
     data: {}
     target:
       entity_id:
-      - media_player.garden
+      - media_player.upstairs
       - media_player.living_room_arc
+  - service: script.thermostat_away
+    data: {}
   mode: single
 - id: returning_home
   alias: Returning home
@@ -39,14 +42,20 @@
     from: 'off'
     to: 'on'
   action:
-  - service: script.thermostat_home
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.vacation_mode
+    data: {}
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.automatic_charging
+    enabled: false
   - condition: time
     after: input_datetime.morning_time
     before: input_datetime.night_time
   - service: script.home_music
-  - service: input_boolean.turn_off
-    target:
-      entity_id: input_boolean.vacation_mode
+    data: {}
   mode: single
 - id: store_hourly_utility_usage
   alias: Store hourly utility usage
@@ -57,7 +66,7 @@
   action:
   - service: notify.utilityhourly
     data_template:
-      message: ',{{states.sensor.energy_consumption_tarif_1.state}},{{states.sensor.energy_consumption_tarif_2.state}},{{states.sensor.energy_production_tarif_1.state}},{{states.sensor.energy_production_tarif_2.state}},{{states.sensor.gas_consumption.state}}'
+      message: ',{{states.sensor.energy_consumption_tarif_1.state}},{{states.sensor.energy_consumption_tarif_2.state}},{{states.sensor.energy_production_tarif_1.state}},{{states.sensor.energy_production_tarif_2.state}},{{states.sensor.gas_consumption.state}},{{states.sensor.current_electricity_price_all_in.state}},{{states.sensor.current_gas_price_all_in.state}},{{states.sensor.current_electricity_market_price.state}},{{states.sensor.current_electricity_sourcing_markup.state}},{{states.sensor.current_electricity_tax_only.state}}'
   initial_state: 'true'
   mode: single
 - id: store_daily_utility_usage
@@ -107,7 +116,7 @@
     data: {}
     target:
       entity_id:
-      - media_player.garden
+      - media_player.upstairs
       - media_player.living_room_arc
   mode: single
 - id: going_to_bed
@@ -137,11 +146,12 @@
   action:
   - service: script.thermostat_sleep
     data: {}
+    enabled: false
   - service: media_player.media_pause
     data: {}
     target:
       entity_id:
-      - media_player.garden
+      - media_player.upstairs
       - media_player.living_room_arc
   - service: light.turn_off
     target:
@@ -333,8 +343,8 @@
           - climate.bathroom
           - climate.hallway
           - climate.office
-    default:
-    - service: script.reload_climate_automations
+        data: {}
+    default: []
   mode: single
 - id: '1623011723106'
   alias: Turn outside lights off when downstairs lights are turned off
@@ -366,9 +376,11 @@
   - service: switch.turn_off
     target:
       entity_id: switch.adaptive_lighting_bedroom
+    data: {}
   - service: input_boolean.turn_off
     target:
       entity_id: input_boolean.woken_up
+    data: {}
   - service: hue.hue_activate_scene
     data:
       group_name: Bedroom
@@ -377,9 +389,14 @@
   - service: input_boolean.turn_off
     target:
       entity_id: input_boolean.night_time
+    data: {}
   - service: input_boolean.turn_on
     target:
-      entity_id: input_boolean.living_room_automatic_lights
+      entity_id:
+      - input_boolean.living_room_automatic_lights
+      - input_boolean.living_room_occupied_recently
+      - input_boolean.upstairs_occupied_recently
+    data: {}
   mode: single
 - id: '1626004480351'
   alias: Tradfri remote
@@ -424,10 +441,14 @@
         target:
           entity_id: input_boolean.night_time
       power_short_double:
-      - service: media_player.media_next_track
+      - service: script.home_music
+        data: {}
+      colordown_long: []
+      colordown_short:
+      - service: input_boolean.toggle
         data: {}
         target:
-          entity_id: media_player.garden
+          entity_id: input_boolean.living_room_automatic_lights
 - id: '1626167291086'
   alias: Next alarm time changed
   description: ''
@@ -563,7 +584,6 @@
   - service: media_player.media_pause
     target:
       entity_id:
-      - media_player.garden
       - media_player.living_room_arc
     data: {}
   mode: single
@@ -641,14 +661,20 @@
   - platform: numeric_state
     entity_id: sun.sun
     attribute: elevation
-    below: '0'
+    below: -1
   - platform: state
     to: 'on'
     for:
       hours: 0
       minutes: 0
       seconds: 0
-    entity_id: light.living_room
+    entity_id:
+    - light.living_room
+  - platform: state
+    entity_id:
+    - input_boolean.night_time
+    from: 'on'
+    to: 'off'
   condition:
   - condition: state
     entity_id: light.living_room
@@ -656,7 +682,7 @@
   - condition: numeric_state
     entity_id: sun.sun
     attribute: elevation
-    below: '0'
+    below: -1
   - condition: state
     entity_id: input_boolean.night_time
     state: 'off'
@@ -677,12 +703,15 @@
   - platform: numeric_state
     entity_id: sun.sun
     attribute: elevation
-    above: '1'
+    above: 0
   condition: []
   action:
   - service: light.turn_off
     target:
-      entity_id: light.garden
+      entity_id:
+      - light.garden
+      - light.garden_table
+    data: {}
   mode: single
 - id: '1634633811557'
   alias: motion lights living room
@@ -700,7 +729,7 @@
       scene_evening: scene.living_room_evening
       scene_night: scene.living_room_night
       elevation_scene_morning: 3
-      elevation_scene_evening: 3
+      elevation_scene_evening: 1
       night_state_boolean: input_boolean.night_time
       light_level: 200
       scene_morning: scene.living_room_morning
@@ -723,7 +752,7 @@
       automation_blocker_boolean: true
       no_motion_blocker_boolean: true
       light_sensor: sensor.motion_f_illuminance
-      light_level: 80
+      light_level: 70
       scene_day: scene.downstairs_hallway_day
       scene_evening: scene.downstairs_hallway_evening
       scene_night: scene.downstairs_hallway_night
@@ -777,17 +806,18 @@
   alias: christmas lights
   description: ''
   trigger:
-  - type: occupied
-    platform: device
-    device_id: dfcb515319c9dba032a7901fc7e58b8e
-    entity_id: binary_sensor.motion_a_occupancy
-    domain: binary_sensor
-    id: 'on'
   - platform: state
     entity_id: light.living_room
     from: 'on'
     to: 'off'
     id: 'off'
+  - platform: state
+    entity_id:
+    - group.living_room_motion
+    - light.living_room
+    from: 'off'
+    to: 'on'
+    id: 'on'
   condition: []
   action:
   - choose:
@@ -825,8 +855,8 @@
     entity_id: binary_sensor.motion_c_activity
     domain: binary_sensor
     for:
-      hours: 1
-      minutes: 0
+      hours: 0
+      minutes: 45
       seconds: 0
     id: empty
   condition: []
@@ -886,30 +916,6 @@
         target:
           entity_id: input_boolean.upstairs_occupied_recently
     default: []
-  mode: single
-- id: '1646663035618'
-  alias: Update Frank Energie prices
-  description: ''
-  trigger:
-  - platform: time_pattern
-    minutes: '2'
-    hours: '*'
-    seconds: '0'
-  condition: []
-  action:
-  - service: homeassistant.update_entity
-    data: {}
-    target:
-      entity_id:
-      - sensor.average_electricity_price_today
-      - sensor.current_electricity_market_price
-      - sensor.current_electricity_price_all_in
-      - sensor.current_electricity_price_including_tax
-      - sensor.highest_gas_price_today
-      - sensor.lowest_gas_price_today
-      - sensor.current_gas_price_including_tax
-      - sensor.current_gas_price_all_in
-      - sensor.current_gas_market_price
   mode: single
 - id: '1646811560297'
   alias: Google Home Dashboard
@@ -1051,6 +1057,10 @@
             data: {}
             target:
               entity_id: media_player.living_room_arc
+          - service: media_player.volume_up
+            data: {}
+            target:
+              entity_id: media_player.upstairs
           - delay:
               hours: 0
               minutes: 0
@@ -1069,6 +1079,10 @@
             data: {}
             target:
               entity_id: media_player.living_room_arc
+          - service: media_player.volume_down
+            data: {}
+            target:
+              entity_id: media_player.upstairs
           - delay:
               hours: 0
               minutes: 0
@@ -1086,6 +1100,10 @@
     entity_id: climate.office
     attribute: current_temperature
     above: '30'
+  - platform: event
+    event_type: mobile_app_notification_action
+    event_data:
+      action: RUN_AUTOMATIC_COOLING
   condition:
   - condition: not
     conditions:
@@ -1093,34 +1111,444 @@
       entity_id: group.awesome_people
       state: home
   action:
-  - service: climate.turn_on
+  - service: script.turn_on
+    data: {}
+    target:
+      entity_id: script.automatic_cooling
+  mode: single
+- id: '1659441591677'
+  alias: Stop automatic cooling
+  description: ''
+  trigger:
+  - platform: event
+    event_type: mobile_app_notification_action
+    event_data:
+      action: STOP_AUTOMATIC_COOLING
+  condition: []
+  action:
+  - service: script.turn_off
+    data: {}
+    target:
+      entity_id: script.automatic_cooling
+  - service: climate.turn_off
     data: {}
     target:
       entity_id:
-      - climate.living_room
       - climate.bedroom
+      - climate.living_room
+  - service: notify.mobile_app_cas_phone
+    data:
+      message: Automatic cooling cancelled
+      title: Inside temperature high
+      data:
+        tag: automatic-cooling
+        channel: Climate
+        sticky: 'false'
+        persistent: 'false'
+        visibility: public
+        color: blue
+        clickAction: /lovelace-home/climate
+        actions:
+        - action: RUN_AUTOMATIC_COOLING
+          title: Cool 1 hour
+  mode: single
+- id: '1661168961006'
+  alias: Adjust car charging speed
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - input_number.charge_speed
+    id: calculated
+  - platform: state
+    entity_id:
+    - input_number.max_car_charge
+    - input_boolean.fully_charge_car
+    - input_text.charge_full_time
+    id: price
+  - platform: time_pattern
+    minutes: '30'
+    id: time
+  - platform: time_pattern
+    minutes: '0'
+    id: time_hour
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: trigger
+          id: price
+        - condition: trigger
+          id: time
+        - condition: trigger
+          id: time_hour
+      sequence:
+      - service: script.determine_desired_charge_speed
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: calculated
+        alias: Calculation result changed
+      sequence:
+      - service: number.set_value
+        data:
+          value: '{{ states("input_number.charge_speed") | float(16) }}'
+        target:
+          entity_id: number.charger_maximum_current
+    default: []
+  mode: queued
+- id: '1661427391496'
+  alias: Turn AC off if energy price is high
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.cheap_electricity
+    to: 'off'
+    from: 'on'
+  condition: []
+  action:
+  - device_id: f42d82a74108802a53625db1db202445
+    domain: climate
+    entity_id: climate.bedroom
+    type: set_hvac_mode
+    hvac_mode: 'off'
+  - device_id: 6bb8155b8fbbb90e14e1bb876f56fff0
+    domain: climate
+    entity_id: climate.living_room
+    type: set_hvac_mode
+    hvac_mode: 'off'
+  - service: automation.turn_off
+    data: {}
+    target:
+      entity_id: automation.turn_ac_off_if_energy_price_is_high
+  mode: single
+- id: '1663255657742'
+  alias: Disable full car charging on disconnect
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.charger_status_connector
+    to: Available
+  condition:
+  - condition: state
+    entity_id: input_boolean.fully_charge_car
+    state: 'on'
+  action:
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.fully_charge_car
+  mode: single
+- id: '1663590509763'
+  alias: Heating office
+  description: ''
+  use_blueprint:
+    path: cascer1/zone_heating.yaml
+    input:
+      climate_mode_sensor: input_select.climate_mode
+      thermostat: climate.office
+      zone_occupance_sensor: input_boolean.office_occupied_recently
+      home_occupance_sensor: input_boolean.house_occupied
+      vacation_mode_sensor: input_boolean.vacation_mode
+      heating_schedule_sensor: schedule.heating_office
+      occupied_temperature: input_number.temperature_office_occupied
+      unoccupied_temperature: input_number.temperature_office_empty
+      cold_temperature: input_number.temperature_office_cold
+      away_temperature: input_number.temperature_office_away
+      vacation_temperature: input_number.temperature_office_vacation
+- id: '1663590736789'
+  alias: Heating bathroom
+  description: ''
+  use_blueprint:
+    path: cascer1/zone_heating.yaml
+    input:
+      climate_mode_sensor: input_select.climate_mode
+      thermostat: climate.bathroom
+      zone_occupance_sensor: input_boolean.upstairs_occupied_recently
+      home_occupance_sensor: input_boolean.house_occupied
+      vacation_mode_sensor: input_boolean.vacation_mode
+      heating_schedule_sensor: schedule.heating_bathroom
+      occupied_temperature: input_number.temperature_bathroom_occupied
+      unoccupied_temperature: input_number.temperature_bathroom_empty
+      cold_temperature: input_number.temperature_bathroom_cold
+      away_temperature: input_number.temperature_bathroom_away
+      vacation_temperature: input_number.temperature_bathroom_vacation
+- id: '1663592394841'
+  alias: Heating living room
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - input_number.temperature_living_away
+    - input_number.temperature_living_cold
+    - input_number.temperature_living_empty
+    - input_number.temperature_living_occupied
+    - input_number.temperature_living_vacation
+    - input_boolean.vacation_mode
+    - schedule.heating_living_room
+    - input_boolean.house_occupied
+    - input_select.climate_mode
+    - input_boolean.living_room_occupied_recently
+  condition: []
+  action:
+  - if:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: input_select.climate_mode
+        state: heat
+    then:
+    - stop: Stopped in not heating mode
+    alias: Check heating mode
+  - if:
+    - condition: state
+      entity_id: input_boolean.vacation_mode
+      state: 'on'
+    then:
+    - if:
+      - condition: state
+        entity_id: schedule.heating_living_room
+        state: 'on'
+      then:
+      - service: climate.turn_on
+        data: {}
+        target:
+          entity_id: climate.living_room
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 10
+          milliseconds: 0
+      - service: climate.set_temperature
+        data:
+          temperature: '{{ states(''input_number.temperature_living_vacation'') |
+            float (16)}}'
+          hvac_mode: heat
+        target:
+          entity_id: climate.living_room
+      else:
+      - if:
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: climate.living_room
+            state: 'off'
+        then:
+        - service: climate.turn_off
+          data: {}
+          target:
+            entity_id:
+            - climate.living_room
+      enabled: false
+    - stop: Stopped in vacation mode
+    alias: Check vacation mode
+  - if:
+    - condition: state
+      entity_id: input_boolean.house_occupied
+      state: 'off'
+    then:
+    - if:
+      - condition: state
+        entity_id: schedule.heating_living_room
+        state: 'on'
+      then:
+      - service: climate.set_temperature
+        data:
+          temperature: '{{ states(''input_number.temperature_living_away'') | float
+            (16) }}'
+          hvac_mode: heat
+        target:
+          entity_id: climate.living_room
+        enabled: false
+      - service: climate.turn_off
+        data: {}
+        target:
+          entity_id: climate.living_room
+      else:
+      - service: climate.turn_off
+        data: {}
+        target:
+          entity_id: climate.living_room
+    - stop: Stopped in away mode
+    alias: Check house occupied
+  - if:
+    - condition: state
+      entity_id: schedule.heating_living_room
+      state: 'off'
+    then:
+    - service: climate.set_temperature
+      data:
+        temperature: '{{ states(''input_number.temperature_living_cold'') | float
+          (16) }}'
+        hvac_mode: heat
+      target:
+        entity_id: climate.living_room
+      enabled: false
+    - service: climate.turn_off
+      data: {}
+      target:
+        entity_id:
+        - climate.living_room
+    - stop: Stopped in cold mode
+    alias: Check schedule is off
+  - if:
+    - condition: state
+      entity_id: input_boolean.living_room_occupied_recently
+      state: 'off'
+    then:
+    - service: climate.turn_on
+      data: {}
+      target:
+        entity_id: climate.living_room
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 3
+        milliseconds: 0
+    - service: climate.set_temperature
+      data:
+        temperature: '{{ states(''input_number.temperature_living_empty'') | float
+          (16) }}'
+        hvac_mode: heat
+      target:
+        entity_id: climate.living_room
+    - stop: Stopped in empty mode
+    alias: Check empty
+  - service: climate.turn_on
+    data: {}
+    target:
+      entity_id: climate.living_room
   - delay:
       hours: 0
       minutes: 0
-      seconds: 15
+      seconds: 10
       milliseconds: 0
   - service: climate.set_temperature
     data:
-      temperature: 22
-      hvac_mode: cool
+      temperature: '{{ states(''input_number.temperature_living_occupied'') | float
+        (16) }}'
+      hvac_mode: heat
     target:
-      entity_id:
-      - climate.living_room
-      - climate.bedroom
-  - delay:
+      entity_id: climate.living_room
+  mode: queued
+  max: 10
+- id: '1663749109384'
+  alias: Toggle living room recent occupancy
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - group.downstairs_motion
+    id: occupied
+    to: 'on'
+  - platform: state
+    entity_id:
+    - group.downstairs_motion
+    id: empty
+    to: 'off'
+    for:
       hours: 0
-      minutes: 30
+      minutes: 35
       seconds: 0
-      milliseconds: 0
-  - service: climate.turn_on
-    data: {}
-    target:
-      entity_id:
-      - climate.bedroom
-      - climate.living_room
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: occupied
+      sequence:
+      - service: input_boolean.turn_on
+        data: {}
+        target:
+          entity_id: input_boolean.living_room_occupied_recently
+    - conditions:
+      - condition: trigger
+        id: empty
+      sequence:
+      - service: input_boolean.turn_off
+        data: {}
+        target:
+          entity_id: input_boolean.living_room_occupied_recently
+    default: []
   mode: single
+- id: '1676291672530'
+  alias: Automatically start car charging
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.charger_status_connector
+    from: Available
+    id: start
+  - platform: state
+    entity_id:
+    - input_boolean.automatic_charging
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+    id: timeout
+  - platform: zone
+    entity_id: person.cas_eliens
+    zone: zone.home
+    event: enter
+    id: cas_home
+  - platform: zone
+    entity_id: person.bert
+    zone: zone.home
+    event: enter
+    id: bert_home
+  condition: []
+  action:
+  - if:
+    - condition: trigger
+      id: timeout
+    then:
+    - service: input_boolean.turn_off
+      data: {}
+      target:
+        entity_id: input_boolean.automatic_charging
+    alias: Timeout
+  - if:
+    - condition: and
+      conditions:
+      - condition: trigger
+        id: start
+      - condition: state
+        entity_id: input_boolean.automatic_charging
+        state: 'on'
+    then:
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 10
+        milliseconds: 0
+    - service: switch.turn_on
+      data: {}
+      target:
+        entity_id: switch.charger_charge_control
+    - service: input_boolean.turn_off
+      data: {}
+      target:
+        entity_id: input_boolean.automatic_charging
+    alias: Start charging
+  - if:
+    - condition: or
+      conditions:
+      - condition: trigger
+        id: cas_home
+      - condition: trigger
+        id: bert_home
+    then:
+    - service: input_boolean.turn_on
+      data: {}
+      target:
+        entity_id: input_boolean.automatic_charging
+    alias: Coming home
+  mode: queued
+  max: 10

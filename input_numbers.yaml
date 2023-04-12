@@ -5,3 +5,132 @@ home_music_volume_level:
   step: 0.01
   mode: slider
   icon: mdi:music
+charge_speed:
+  name: Desired car charging speed
+  min: 0
+  max: 16
+  step: 1
+  mode: slider
+  unit_of_measurement: A
+max_car_charge:
+  name: Maximum battery charge level
+  min: 50
+  max: 100
+  step: 5
+  mode: slider
+  unit_of_measurement: "%"
+car_battery_level:
+  name: Car battery level
+  min: 0
+  max: 100
+  step: 1
+  mode: slider
+  unit_of_measurement: "%"
+  
+temperature_office_occupied:
+  name: Temperature Office Occupied
+  min: 12
+  max: 20
+  step: 0.5
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_office_empty:
+  name: Temperature Office Empty
+  min: 12
+  max: 20
+  step: 0.5
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_office_cold:
+  name: Temperature Office Cold
+  min: 12
+  max: 20
+  step: 0.5
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_office_away:
+  name: Temperature Office Away
+  min: 12
+  max: 20
+  step: 0.5
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_office_vacation:
+  name: Temperature Office Vacation
+  min: 12
+  max: 20
+  step: 0.5
+  mode: slider
+  unit_of_measurement: "°C"
+
+temperature_bathroom_occupied:
+  name: Temperature Bathroom Occupied
+  min: 12
+  max: 20
+  step: 0.5
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_bathroom_empty:
+  name: Temperature Bathroom Empty
+  min: 12
+  max: 20
+  step: 0.5
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_bathroom_cold:
+  name: Temperature Bathroom Cold
+  min: 12
+  max: 20
+  step: 0.5
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_bathroom_away:
+  name: Temperature Bathroom Away
+  min: 12
+  max: 20
+  step: 0.5
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_bathroom_vacation:
+  name: Temperature Bathroom Vacation
+  min: 12
+  max: 20
+  step: 0.5
+  mode: slider
+  unit_of_measurement: "°C"
+
+temperature_living_occupied:
+  name: Temperature Living Room Occupied
+  min: 16
+  max: 20
+  step: 1
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_living_empty:
+  name: Temperature Living Room Empty
+  min: 16
+  max: 20
+  step: 1
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_living_cold:
+  name: Temperature Living Room Cold
+  min: 16
+  max: 20
+  step: 1
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_living_away:
+  name: Temperature Living Room Away
+  min: 16
+  max: 20
+  step: 1
+  mode: slider
+  unit_of_measurement: "°C"
+temperature_living_vacation:
+  name: Temperature Living Room Vacation
+  min: 16
+  max: 20
+  step: 1
+  mode: slider
+  unit_of_measurement: "°C"
